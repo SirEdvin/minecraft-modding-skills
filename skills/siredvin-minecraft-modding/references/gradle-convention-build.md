@@ -1,6 +1,6 @@
-# modding-buildenv Conventions
+# SirEdvin Gradle Convention Build
 
-`modding-buildenv` is SirEdvin's custom Gradle convention plugin repository. It currently publishes version `0.9.0` and wraps common Minecraft mod build concerns.
+SirEdvin's custom Gradle convention plugin repository currently publishes version `0.9.0` and wraps common Minecraft mod build concerns.
 
 ## Plugin IDs Seen in Consumers
 
@@ -15,7 +15,7 @@
 
 ## Convention Blocks
 
-Preserve these blocks unless the task explicitly touches the buildenv itself:
+Preserve these blocks unless the task explicitly touches the custom build logic itself:
 
 - `baseShaking`
 - `vanillaShaking`
@@ -50,17 +50,17 @@ If CI cannot resolve custom plugin markers, use a plugin management resolution s
 resolutionStrategy {
     eachPlugin {
         if (requested.id.id.startsWith("site.siredvin.")) {
-            useModule("site.siredvin:modding-buildenv:${requested.version}")
+            useModule("site.siredvin:<custom-build-artifact>:${requested.version}")
         }
     }
 }
 ```
 
-After buildenv 0.9.0, plugin markers may resolve directly, but the resolution strategy remains a useful CI fallback in consumers.
+After version 0.9.0, plugin markers may resolve directly, but the resolution strategy remains a useful CI fallback in consumers.
 
 ## Validation
 
-For buildenv changes:
+For custom build-logic changes:
 
 ```bash
 ./gradlew --no-daemon check
@@ -76,7 +76,7 @@ For consumer resolution changes:
 
 Publishing to the private Maven repository requires GitHub or local credentials. Do not publish or deploy unless the user explicitly asks.
 
-GitHub repository secrets required for automated Maven publishing in `SirEdvin/modding-buildenv`:
+GitHub repository secrets required for automated Maven publishing in the custom build-logic repository:
 
 - `SIR_EDVIN_MAVEN_USERNAME`
 - `SIR_EDVIN_MAVEN_PASSWORD`

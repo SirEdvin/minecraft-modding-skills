@@ -9,7 +9,7 @@ This repository is designed to be installable by Hermes Agent, skills.sh-compati
 | Skill | Purpose |
 | --- | --- |
 | `minecraft-modding` | Global, public Minecraft modding workflow for Fabric, Forge, NeoForge, Gradle, mappings, mixins, datagen, networking, and common integrations. |
-| `siredvin-minecraft-modding` | SirEdvin-specific overlay for local repositories, modding-buildenv, Minecraft-Modding-Libs, CC:Tweaked/peripheral projects, and private Maven/build conventions. |
+| `siredvin-minecraft-modding` | SirEdvin-specific overlay for local repositories, the custom Gradle build environment, Minecraft-Modding-Libs, CC:Tweaked/peripheral projects, and private Maven/build conventions. |
 
 ## Install with Hermes
 

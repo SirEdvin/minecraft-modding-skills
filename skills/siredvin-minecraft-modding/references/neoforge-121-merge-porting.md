@@ -11,7 +11,7 @@ Use when merging a 1.20.x maintenance branch into a 1.21.x NeoForge migration br
 ## Buildenv/plugin resolution
 
 - Clean GitHub runners may fail to resolve `site.siredvin.*` Gradle plugins even if local caches or plugin marker paths work locally.
-- For SirEdvin buildenv plugins, add explicit plugin resolution mapping in `settings.gradle.kts`:
+- For SirEdvin custom build plugins, add explicit plugin resolution mapping in `settings.gradle.kts`:
 
 ```kotlin
 resolutionStrategy {
@@ -20,7 +20,7 @@ resolutionStrategy {
             useModule("org.spongepowered:mixingradle:${requested.version}")
         }
         if (requested.id.id.startsWith("site.siredvin.")) {
-            useModule("site.siredvin:modding-buildenv:${requested.version}")
+            useModule("site.siredvin:<custom-build-artifact>:${requested.version}")
         }
     }
 }
