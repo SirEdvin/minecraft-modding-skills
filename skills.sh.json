@@ -3,7 +3,15 @@
   "groupings": [
     {
       "title": "Minecraft Modding",
-      "skills": ["minecraft-modding", "siredvin-minecraft-modding"]
+      "skills": [
+        "minecraft-modding",
+        "minecraft-fabric-modding",
+        "minecraft-neoforge-modding",
+        "minecraft-legacy-forge-modding",
+        "kubejs-modding",
+        "modrinth-api",
+        "siredvin-minecraft-modding"
+      ]
     }
   ]
 }

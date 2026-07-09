@@ -1,6 +1,6 @@
 ---
 name: siredvin-minecraft-modding
-description: Use when working on SirEdvin Minecraft modding repositories, including Turtlematic, DigitalItems, Minecraft-Modding-Libs, UnlimitedPeripheralWorks, GregTech True Age of Steam, CloudSolutions, SmartHome-Appliances, and the custom Gradle build environment. Adds local paths, build conventions, private Maven coordinates, branch/version inventory, and repository-specific validation guidance on top of the generic minecraft-modding skill.
+description: Use when working on SirEdvin Minecraft modding repositories, including Turtlematic, DigitalItems, Minecraft-Modding-Libs, UnlimitedPeripheralWorks, the GTCEu addon repository, CloudSolutions, SmartHome-Appliances, and the custom Gradle build environment. Adds local paths, build conventions, private Maven coordinates, branch/version inventory, and repository-specific validation guidance on top of the generic minecraft-modding skill.
 version: 1.0.0
 author: SirEdvin
 license: MIT
@@ -14,7 +14,15 @@ metadata:
 
 ## Overview
 
-Load this skill after `minecraft-modding` when working on SirEdvin Minecraft repositories. The generic skill carries reusable Fabric/Forge/NeoForge practice; this overlay carries local repository paths, observed branches, build plugin conventions, Maven coordinates, and SirEdvin-specific pitfalls.
+Load this skill after `minecraft-modding` and the relevant public specialist when working on SirEdvin Minecraft repositories. The public skills carry reusable Fabric/Forge/NeoForge/KubeJS/Modrinth practice; this overlay carries local repository paths, observed branches, build plugin conventions, Maven coordinates, and SirEdvin-specific pitfalls.
+
+Specialist routing:
+
+- Load `minecraft-fabric-modding` for `projects/fabric`, Fabric Kotlin, Fabric access wideners, Fabric datagen, or Fabric-specific CC:Tweaked integration.
+- Load `minecraft-legacy-forge-modding` for Forge `1.20.1` / Forge `47.x`, Java 17, `mods.toml`, `SimpleChannel`, capabilities, access transformers, or GTCEu/KubeJS/Rhino Forge integrations.
+- Load `minecraft-neoforge-modding` for NeoForge `1.21.1+`, Java 21+, `neoforge.mods.toml`, ModDevGradle, payload networking, components, attachments, or NeoForge datagen.
+- Load `kubejs-modding` when a task touches KubeJS/Rhino scripts or a Java addon surface consumed from KubeJS.
+- Load `modrinth-api` for Modrinth lookup, loader/version filtering, hashes, or downloads.
 
 Supporting references:
 
@@ -25,7 +33,7 @@ Supporting references:
 ## When to Use
 
 - The task touches any repository under `/home/siredvin/projects` related to SirEdvin Minecraft mods.
-- The user mentions Turtlematic, DigitalItems, Minecraft-Modding-Libs, UnlimitedPeripheralWorks, GregTech True Age of Steam, CloudSolutions, SmartHome-Appliances, the custom Gradle build environment, Broccolium, Tweakium, Peripheralium, CC:Tweaked peripherals, or SirEdvin Maven.
+- The user mentions Turtlematic, DigitalItems, Minecraft-Modding-Libs, UnlimitedPeripheralWorks, the GTCEu addon repository, CloudSolutions, SmartHome-Appliances, the custom Gradle build environment, Broccolium, Tweakium, Peripheralium, CC:Tweaked peripherals, or SirEdvin Maven.
 - A change involves custom Gradle plugins under `site.siredvin.*`, the custom build artifact, `baseShaking`, `fabricShaking`, `forgeShaking`, `neoforgeShaking`, `publishingShaking`, or `modPublishing`.
 - Work may affect Forge 1.20.1, NeoForge 1.21.1, Java 17/21/25 requirements, private Maven publishing, or GitHub Actions publishing.
 
@@ -43,7 +51,7 @@ Known repositories:
 - `/home/siredvin/projects/DigitalItems`
 - `/home/siredvin/projects/Minecraft-Modding-Libs`
 - `/home/siredvin/projects/UnlimitedPeripheralWorks`
-- `/home/siredvin/projects/GregTech-True-Age-of-Steam`
+- the GTCEu addon repository under `/home/siredvin/projects/`
 - `/home/siredvin/projects/CloudSolutions`
 - `/home/siredvin/projects/SmartHome-Appliances`
 - the custom Gradle convention build repository under `/home/siredvin/projects/`
@@ -88,7 +96,7 @@ Observed local inventory during skill refresh:
 - CloudSolutions: branch `1.20`, Minecraft `1.20.1`, Forge/Fabric, custom build conventions `0.8.18`, Forge `47.4.10`.
 - Minecraft-Modding-Libs: active local merge-port branch, Minecraft `1.21.1`, custom build conventions `0.9.0`, Fabric and NeoForge-style modules, plugin resolution maps `site.siredvin.*` to the custom build artifact.
 - SmartHome-Appliances: branch `1.21`, Minecraft `1.21.1`, Fabric active, Forge module commented in settings, custom build conventions `0.8.14`.
-- GregTech True Age of Steam: local build-environment migration branch, Minecraft/Forge `1.20.1` / `47.4.10`, custom build conventions `0.9.0`, single-loader Forge/GregTech project with Java 17 guidance in its AGENTS.md.
+- GTCEu addon repository: local build-environment migration branch, Minecraft/Forge `1.20.1` / `47.4.10`, custom build conventions `0.9.0`, single-loader Forge/GregTech project with Java 17 guidance in its AGENTS.md.
 - Custom Gradle convention build: branch `main`, projectVersion `0.9.0`, publishes custom convention plugins and includes NeoForge ModDevGradle plugin dependency.
 
 This inventory is a starting point only. Always re-read files before changing code.
@@ -134,7 +142,7 @@ For custom build convention work:
 ./gradlew --no-daemon publishToMavenLocal
 ```
 
-For GregTech True Age of Steam, follow the repo AGENTS.md: `./gradlew build`, `spotlessCheck`, `spotlessApply`, `runClient`, `runServer`, and `runData` are the relevant commands; prefer adding `--no-daemon` for this user.
+For the GTCEu addon repository, follow the repo AGENTS.md: `./gradlew build`, `spotlessCheck`, `spotlessApply`, `runClient`, `runServer`, and `runData` are the relevant commands; prefer adding `--no-daemon` for this user.
 
 ## Pitfalls
 
@@ -148,7 +156,7 @@ For GregTech True Age of Steam, follow the repo AGENTS.md: `./gradlew build`, `s
 
 ## Verification Checklist
 
-- [ ] Loaded generic `minecraft-modding` first, then this overlay.
+- [ ] Loaded generic `minecraft-modding`, the relevant public specialist, then this overlay.
 - [ ] Re-read the target repo's branch, `gradle.properties`, `settings.gradle.kts`, build files, and metadata.
 - [ ] Confirmed whether `forge` means Forge 1.20.1, NeoForge 1.21.1, or migration state.
 - [ ] Preserved custom `site.siredvin.*` build conventions and dependency scope buckets.

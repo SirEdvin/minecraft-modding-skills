@@ -14,9 +14,21 @@ metadata:
 
 ## Overview
 
-Use this skill to work on Minecraft Java mods without guessing the loader, mappings, or active Minecraft version. Minecraft modding is version-sensitive: a pattern that is correct for Forge 1.20.1 can be wrong for NeoForge 1.21.1 or later 26.x docs, and Fabric APIs differ again. Treat the repository's Gradle files and upstream docs as the root system; let memory only suggest where to look.
+Use this umbrella skill to route Minecraft Java mod work without guessing the loader, mappings, or active Minecraft version. Minecraft modding is version-sensitive: a pattern that is correct for Forge 1.20.1 can be wrong for NeoForge 1.21.1 or later 26.x docs, and Fabric APIs differ again. Treat the repository's Gradle files and upstream docs as the root system; let memory only suggest where to look.
 
 This skill is intentionally global and portable. If a project has local conventions, private Maven coordinates, or organization-specific build plugins, load a project-specific overlay skill after this one.
+
+## Specialist Routing
+
+Load this umbrella first, then load only the smallest matching specialist:
+
+- `minecraft-fabric-modding` for Fabric Loader/API/Loom, `fabric.mod.json`, Fabric access wideners, Fabric networking/events/datagen, Fabric Kotlin, or Fabric modules in multiloader repos.
+- `minecraft-neoforge-modding` for modern NeoForge `1.21.1+`, ModDevGradle, `neoforge.mods.toml`, NeoForge registries/events/payloads/components/attachments/datagen, or Java 21+ NeoForge work.
+- `minecraft-legacy-forge-modding` for MinecraftForge `1.20.1` / Forge `47.x`, ForgeGradle or `net.neoforged.moddev.legacyforge`, `mods.toml`, `DeferredRegister` / `RegistryObject`, `SimpleChannel`, capabilities, ATs, reobf, or Forge datagen.
+- `kubejs-modding` for KubeJS/Rhino/ProbeJS scripts, pack recipes/tags/schemas, reload/log debugging, or Java addon integration boundaries.
+- `modrinth-api` for read-only Modrinth v2 project/search/version/file lookup, loader/version filtering, downloads, hashes, and required `User-Agent` handling.
+
+For SirEdvin repositories, load `siredvin-minecraft-modding` after the relevant public specialist.
 
 Supporting references:
 
