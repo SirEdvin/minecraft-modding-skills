@@ -72,6 +72,19 @@ For SirEdvin repositories, load the umbrella, the relevant public specialist, an
 
 The global skill intentionally avoids local filesystem paths and private repository assumptions. The SirEdvin overlay carries those local conventions so the public skill stays reusable.
 
+## Validate
+
+Install the pinned Python development dependencies, then run the repository, official Agent Skills, manifest, and discovery checks:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 scripts/validate-skills.py
+for d in skills/*; do uvx --from skills-ref==0.1.1 agentskills validate "$d"; done
+python3 -m json.tool skills.sh.json
+npx -y skills@1.5.15 add . --list --full-depth
+git diff --check
+```
+
 ## Provenance
 
 See `PROVENANCE.md` for the license-safe attribution note and official documentation sources used for the newly authored specialist skills.

@@ -1,24 +1,21 @@
 ---
 name: minecraft-legacy-forge-modding
 description: Use when working on MinecraftForge 1.20.1 / Forge 47.x projects, ForgeGradle or net.neoforged.moddev.legacyforge builds, Java 17, mods.toml, DeferredRegister and RegistryObject, SimpleChannel networking, capabilities, mixins, access transformers, reobfuscation, or Forge datagen.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Independently authored for Forge 1.20.1 and Forge 47.x projects; verify exact Minecraft, Forge, ForgeGradle or legacy ModDevGradle, Java, mappings, and optional integration versions before applying API details.
 metadata:
-  hermes:
-    tags: [minecraft, forge, minecraftforge, forgegradle, legacyforge, java17, datagen]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "minecraft, forge, minecraftforge, forgegradle, legacyforge, java17, datagen"
 ---
 
 # Minecraft Legacy Forge Modding
 
-Use this specialist after `minecraft-modding` for MinecraftForge `1.20.1` / Forge `47.x` projects, including builds using classic ForgeGradle or `net.neoforged.moddev.legacyforge`. This is not modern NeoForge: keep `mods.toml`, Forge event buses, Forge capabilities, `SimpleChannel`, access transformers, and reobfuscation behavior aligned with the existing repo.
+Use this specialist directly, or after `minecraft-modding`, for MinecraftForge `1.20.1` / Forge `47.x` projects, including builds using classic ForgeGradle or `net.neoforged.moddev.legacyforge`. This is not modern NeoForge: keep `mods.toml`, Forge event buses, Forge capabilities, `SimpleChannel`, access transformers, and reobfuscation behavior aligned with the existing repo.
 
 References:
 
 - `references/forge-1201-checklist.md`
-- `../minecraft-modding/references/repository-inspection-checklist.md`
-- `../minecraft-modding/references/integration-surfaces.md`
 
 ## Workflow
 

@@ -1,0 +1,31 @@
+name: Validate skills
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install validation tools
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip install uv==0.11.8
+      - name: Validate skill packages and skills.sh schema
+        run: python scripts/validate-skills.py
+      - name: Run official Agent Skills validation
+        run: for d in skills/*; do uvx --from skills-ref==0.1.1 agentskills validate "$d"; done
+      - name: Check skills.sh discovery
+        run: npx -y skills@1.5.15 add . --list --full-depth

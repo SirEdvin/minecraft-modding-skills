@@ -15,7 +15,7 @@ Key reminders from the docs:
 - Fabric's core pieces are Fabric Loader, Fabric API, and Fabric Loom.
 - The docs' examples use unobfuscated/Mojang-style names and versioned docs; verify mapping assumptions in older projects.
 - Datagen can be enabled from project creation or manually via `fabricApi { configureDataGeneration() { ... } }`, a `DataGeneratorEntrypoint`, and a `fabric-datagen` entrypoint in `fabric.mod.json`; generated files commonly go under `src/main/generated`.
-- Networking uses custom payloads (`CustomPacketPayload`), registered payload types/codecs, and `ServerPlayNetworking` / `ClientPlayNetworking`. Server receivers must validate client-provided data.
+- Newer payload-based APIs, including the checked `1.21.1` line, use `CustomPacketPayload`, registered payload types/codecs, and `ServerPlayNetworking` / `ClientPlayNetworking`. Fabric `1.20.1` projects may instead use `Identifier` / `PacketByteBuf` APIs; follow the exact installed Fabric API and existing project pattern. Server receivers must validate client-provided data.
 
 ## NeoForge
 

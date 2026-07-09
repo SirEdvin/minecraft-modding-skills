@@ -1,13 +1,12 @@
 ---
 name: minecraft-modding
 description: Use when developing, debugging, migrating, or reviewing Minecraft Java mods across Fabric, Forge, NeoForge, Gradle/Loom/ModDevGradle, mixins, access wideners/transformers, data generation, networking, resources, and integrations such as CC:Tweaked, JEI/REI/EMI, Architectury, and Kotlin loader bridges.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Requires a Java/Gradle Minecraft mod repository and network access for version-specific Fabric, Forge, NeoForge, and integration documentation.
 metadata:
-  hermes:
-    tags: [minecraft, modding, fabric, forge, neoforge, gradle, mixins, datagen]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "minecraft, modding, fabric, forge, neoforge, gradle, mixins, datagen"
 ---
 
 # Minecraft Modding
@@ -73,7 +72,7 @@ Do not use this as a substitute for official version docs. The correct API surfa
 5. **Consult official docs for the active version.**
    - Fabric docs identify Fabric Loader, Fabric API, and Fabric Loom as the core toolchain and include a reference mod under `FabricMC/fabric-docs/reference/latest`.
    - Fabric datagen uses `fabricApi { configureDataGeneration() { ... } }`, a `fabric-datagen` entrypoint, and commonly outputs to `src/main/generated` via `runDatagen`.
-   - Fabric networking uses `CustomPacketPayload`, `PayloadTypeRegistry`, and side-specific `ServerPlayNetworking` / `ClientPlayNetworking`; always validate client-originated payloads on the server.
+   - Newer payload-based Fabric APIs, including the checked `1.21.1` line, use `CustomPacketPayload`, `PayloadTypeRegistry`, and side-specific `ServerPlayNetworking` / `ClientPlayNetworking`. Fabric `1.20.1` projects may instead use `Identifier` / `PacketByteBuf` APIs; follow the exact installed Fabric API and existing project pattern. Always validate client-originated packets on the server.
    - NeoForge docs are NeoForge-specific, not Java tutorials. Use the getting-started, toolchain, registry, networking, and version primer pages for the active target.
    - NeoForge registration usually prefers `DeferredRegister` attached to the mod event bus; raw `RegisterEvent` is available but easier to misuse.
    - NeoForge networking uses `RegisterPayloadHandlersEvent` and custom payload registration/handlers.

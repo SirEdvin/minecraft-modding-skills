@@ -1,24 +1,21 @@
 ---
 name: minecraft-neoforge-modding
 description: Use when working on modern NeoForge Minecraft mods, NeoForge 1.21.1 or later, ModDevGradle, Java 21+, Kotlin compatibility, neoforge.mods.toml, registries/events, payload networking, data components, attachments, datagen, or dedicated-server safety.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Independently authored for modern NeoForge projects; verify exact Minecraft, NeoForge, ModDevGradle or NeoGradle, Java, Kotlin, and mappings versions from repository files before applying API details.
 metadata:
-  hermes:
-    tags: [minecraft, neoforge, moddevgradle, java21, kotlin, networking, datagen]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "minecraft, neoforge, moddevgradle, java21, kotlin, networking, datagen"
 ---
 
 # Minecraft NeoForge Modding
 
-Use this specialist after `minecraft-modding` for NeoForge `1.21.1+` codebases or NeoForge modules inside multiloader projects. Prefer current NeoForge docs over older Forge habits; do not introduce `net.minecraftforge.*` imports into NeoForge-native modules unless the repository is intentionally transitional.
+Use this specialist directly, or after `minecraft-modding`, for NeoForge `1.21.1+` codebases or NeoForge modules inside multiloader projects. Prefer current NeoForge docs over older Forge habits; do not introduce `net.minecraftforge.*` imports into NeoForge-native modules unless the repository is intentionally transitional.
 
 References:
 
 - `references/neoforge-version-checklist.md`
-- `../minecraft-modding/references/version-migration-guide.md`
-- `../minecraft-modding/references/repository-inspection-checklist.md`
 
 ## Workflow
 

@@ -1,24 +1,21 @@
 ---
 name: minecraft-fabric-modding
 description: Use when working on Fabric Minecraft mods, Fabric Loader/API/Loom, fabric.mod.json, Java or Kotlin Fabric code, multiloader Fabric modules, Fabric registries/events/networking/datagen, mixins, access wideners, or dedicated-server safety.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Independently authored for Fabric projects; verify exact Minecraft, Fabric Loader, Fabric API, Loom, Yarn/Mojang mappings, Java, and Kotlin versions from repository files before applying API details.
 metadata:
-  hermes:
-    tags: [minecraft, fabric, loom, fabric-api, kotlin, mixins, datagen]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "minecraft, fabric, loom, fabric-api, kotlin, mixins, datagen"
 ---
 
 # Minecraft Fabric Modding
 
-Use this specialist after `minecraft-modding` when the target is Fabric or a Fabric module in a multiloader repository. Keep common gameplay logic in the shared/core layer only when the imports are loader-neutral; put Fabric entrypoints, metadata, access wideners, networking bootstrap, datagen entrypoints, and client setup in the Fabric layer.
+Use this specialist directly, or after `minecraft-modding`, when the target is Fabric or a Fabric module in a multiloader repository. Keep common gameplay logic in the shared/core layer only when the imports are loader-neutral; put Fabric entrypoints, metadata, access wideners, networking bootstrap, datagen entrypoints, and client setup in the Fabric layer.
 
 References:
 
 - `references/fabric-version-checklist.md`
-- `../minecraft-modding/references/repository-inspection-checklist.md`
-- `../minecraft-modding/references/framework-docs-map.md`
 
 ## Workflow
 

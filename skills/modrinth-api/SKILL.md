@@ -1,13 +1,12 @@
 ---
 name: modrinth-api
 description: Use when querying Modrinth API v2 project/search/version/file endpoints, source lookup, loader and Minecraft-version filtering, hashes, downloads, checksum verification, or required User-Agent handling for read-only Modrinth workflows.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Independently authored for read-only Modrinth API v2 workflows; verify current official endpoint documentation before relying on parameters or response fields.
 metadata:
-  hermes:
-    tags: [modrinth, api, minecraft, downloads, hashes]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "modrinth, api, minecraft, downloads, hashes"
 ---
 
 # Modrinth API
@@ -25,7 +24,7 @@ References:
 3. Send `User-Agent: <owner>/<tool>/<semver> (<contact or repo>)` or another uniquely identifying value.
 4. For discovery, use `/search` with documented `query`, `facets`, `index`, `offset`, and `limit` parameters.
 5. For a known project, use `/project/{id|slug}` and `/project/{id|slug}/version` with documented filters.
-6. For files, use version file hashes and verify downloaded bytes against `sha512` or `sha1` from the returned file metadata.
+6. For files, select the file with `primary: true`. If none is primary, use the first file in the documented response order as the fallback. Then verify downloaded bytes against `sha512` or `sha1` from that file's metadata.
 
 ## Important Limits
 
@@ -36,5 +35,5 @@ References:
 ## Validation
 
 - Check HTTP status and rate-limit headers.
-- Verify the selected version has the expected loader, game version, project id, and primary file.
+- Verify the selected version has the expected loader, game version, project id, and either a primary file or the documented first-file fallback.
 - Hash downloaded bytes before trusting a file path or cache hit.

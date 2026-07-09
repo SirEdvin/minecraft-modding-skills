@@ -1,13 +1,12 @@
 ---
 name: siredvin-minecraft-modding
 description: Use when working on SirEdvin Minecraft modding repositories, including Turtlematic, DigitalItems, Minecraft-Modding-Libs, UnlimitedPeripheralWorks, the GTCEu addon repository, CloudSolutions, SmartHome-Appliances, and the custom Gradle build environment. Adds local paths, build conventions, private Maven coordinates, branch/version inventory, and repository-specific validation guidance on top of the generic minecraft-modding skill.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Intended for SirEdvin's local development environment and repositories under /home/siredvin/projects; load after the generic minecraft-modding skill.
 metadata:
-  hermes:
-    tags: [minecraft, siredvin, gradle-conventions, cc-tweaked, neoforge, forge, fabric]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "minecraft, siredvin, gradle-conventions, cc-tweaked, neoforge, forge, fabric"
 ---
 
 # SirEdvin Minecraft Modding Overlay

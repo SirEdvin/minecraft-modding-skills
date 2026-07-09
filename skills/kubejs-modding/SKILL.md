@@ -1,13 +1,12 @@
 ---
 name: kubejs-modding
 description: Use when working on KubeJS, Rhino, ProbeJS, Minecraft pack scripts, startup/server/client script folders, recipes, tags, custom schemas, KubeJS logs and reload behavior, or boundaries between KubeJS scripts and compiled Java addons.
-version: 1.0.0
-author: SirEdvin
 license: MIT
 compatibility: Independently authored for KubeJS/Rhino/ProbeJS work, with Minecraft 1.20.1 focus; verify exact KubeJS, Rhino, ProbeJS, loader, and addon versions from the pack or mod repository before applying API details.
 metadata:
-  hermes:
-    tags: [minecraft, kubejs, rhino, probejs, scripts, modpacks]
+  author: SirEdvin
+  version: "1.0.0"
+  hermes-tags: "minecraft, kubejs, rhino, probejs, scripts, modpacks"
 ---
 
 # KubeJS Modding
@@ -17,7 +16,6 @@ Use this specialist for KubeJS pack scripting and for Java mods that expose or c
 References:
 
 - `references/kubejs-workflows.md`
-- `../minecraft-modding/references/integration-surfaces.md`
 
 ## Workflow
 

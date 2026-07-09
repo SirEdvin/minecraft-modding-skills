@@ -39,6 +39,7 @@ Official sources used for this reference:
 - Endpoint: `GET /version_file/{hash}` with required `algorithm` (`sha1` or `sha512`).
 - Batch endpoints exist for multiple hashes; use them when checking many files.
 - Version file metadata includes `url`, `filename`, `primary`, `size`, and `hashes`.
+- Select the file with `primary: true`; if no file is primary, select the first file in the documented response order as the fallback.
 - Download to a temporary/cache path, compute the documented hash over bytes, then move/use the file only after the digest matches.
 
 ## Source Lookup
