@@ -1,6 +1,9 @@
 ---
 name: kubejs-modding
 description: KubeJS Minecraft modpack scripting guidance based on the official KubeJS wiki and source. Use when writing or reviewing KubeJS scripts, startup_scripts, server_scripts, client_scripts, recipe changes, item/block/fluid/entity registry scripts, tags, loot, custom events, Java.type/Java.loadClass usage, ProbeJS typings, mod integrations, reload behavior, server/client safety, or pack-dev automation for Forge, NeoForge, or Fabric modpacks.
+license: MIT
+metadata:
+  version: "1.0.0"
 ---
 
 # KubeJS Modding

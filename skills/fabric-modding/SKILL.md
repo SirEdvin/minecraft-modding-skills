@@ -1,6 +1,9 @@
 ---
 name: fabric-modding
 description: Fabric Minecraft mod development guidance based on Fabric Loader, Fabric API, Fabric Loom, Yarn mappings, and official Fabric docs. Use when working on Fabric mods, fabric.mod.json, ModInitializer, ClientModInitializer, Fabric API events, registries, items, blocks, data generation, networking payloads, mixins, access wideners, Loom Gradle setup, client/server environment safety, or porting between Fabric and Forge/NeoForge.
+license: MIT
+metadata:
+  version: "1.0.0"
 ---
 
 # Fabric Modding

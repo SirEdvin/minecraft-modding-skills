@@ -1,6 +1,9 @@
 ---
 name: modrinth-api
 description: Use the Modrinth API (v2) to search Minecraft mods, read project metadata, download JARs, and locate source repositories. No API token required for read operations. Use when fetching mod info from Modrinth, searching mods by name/category/loader/version, downloading mod files programmatically, or finding a mod's GitHub/source-code URL.
+license: MIT
+metadata:
+  version: "1.0.0"
 ---
 
 # Modrinth API
