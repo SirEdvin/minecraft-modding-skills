@@ -4,13 +4,12 @@
     {
       "title": "Minecraft Modding",
       "skills": [
-        "minecraft-modding",
-        "minecraft-fabric-modding",
-        "minecraft-neoforge-modding",
-        "minecraft-legacy-forge-modding",
+        "fabric-modding",
+        "gtceu-addon",
         "kubejs-modding",
         "modrinth-api",
-        "siredvin-minecraft-modding"
+        "neoforge-legacy-modding",
+        "neoforge-modding"
       ]
     }
   ]

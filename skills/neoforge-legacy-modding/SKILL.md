@@ -1,6 +1,9 @@
 ---
 name: neoforge-legacy-modding
 description: NeoForge Legacy Forge / MinecraftForge 1.17-1.20.1 mod development guidance using NeoForged ModDevGradle's legacyforge plugin. Use when working on 1.20.1-legacy MDK projects, net.neoforged.moddev.legacyforge, Forge 47.x, net.minecraftforge.* APIs, mods.toml, DeferredRegister with RegistryObject, FMLJavaModLoadingContext, MinecraftForge.EVENT_BUS, SimpleChannel networking, Forge datagen, access transformers, mixins, reobfuscation, or porting between legacy Forge 1.20.1 and modern NeoForge.
+license: MIT
+metadata:
+  version: "1.0.0"
 ---
 
 # NeoForge Legacy Modding

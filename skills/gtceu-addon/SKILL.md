@@ -1,7 +1,9 @@
 ---
-name: GregTech Modern Addon Development
+name: gtceu-addon
 description: This skill should be used when the user wants to create, extend, or debug a GregTech CEu Modern (GTCEu) addon for Minecraft 1.20.1 (Forge) or 1.21.1+ (NeoForge). Covers materials, machines, multiblocks, recipes, KubeJS integration, and addon project setup.
-version: 1.0.0
+license: MIT
+metadata:
+  version: "1.0.0"
 ---
 
 # GregTech CEu Modern Addon Development

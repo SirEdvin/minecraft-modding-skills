@@ -54,7 +54,11 @@ def parse_frontmatter(path):
 
 def check_local_path(markdown_path, skill_root, target):
     clean = target.split("#", 1)[0].split("?", 1)[0].strip()
-    if not clean:
+    if (
+        not clean
+        or re.match(r"^[a-z][a-z0-9+.-]*://", clean, re.IGNORECASE)
+        or re.search(r"<[^>]+>", clean)
+    ):
         return
     candidate = (markdown_path.parent / clean).resolve()
     try:

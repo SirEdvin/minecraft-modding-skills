@@ -1,6 +1,9 @@
 ---
 name: neoforge-modding
 description: NeoForge Minecraft mod development guidance based on the official NeoForge docs. Use when working on NeoForge mods, Minecraft mod loaders, Java modding projects, Gradle MDK/ModDevGradle/NeoGradle setup, registries, DeferredRegister, events, client/server sides, items, blocks, data generation, resources, custom payload networking, or dedicated-server safety.
+license: MIT
+metadata:
+  version: "1.0.0"
 ---
 
 # NeoForge Modding
