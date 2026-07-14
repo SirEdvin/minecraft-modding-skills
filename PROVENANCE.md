@@ -59,3 +59,9 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://docs.modrinth.com/api/operations/getlatestversionfromhash/
 - https://docs.modrinth.com/api/operations/versionsfromhashes/
 - https://docs.modrinth.com/api/operations/versionlist/
+
+`testiarium-gametest`:
+
+- https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/main/projects/testiarium-core
+- https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/main/projects/testiarium-forge
+- https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/main/projects/testiarium-fabric

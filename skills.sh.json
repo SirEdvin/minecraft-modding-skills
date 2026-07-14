@@ -9,7 +9,8 @@
         "kubejs-modding",
         "modrinth-api",
         "neoforge-legacy-modding",
-        "neoforge-modding"
+        "neoforge-modding",
+        "testiarium-gametest"
       ]
     }
   ]
