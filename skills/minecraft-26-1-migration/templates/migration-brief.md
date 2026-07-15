@@ -64,7 +64,14 @@ For every persistent or synchronized value:
 |---|---|---|---|---|---|
 | | | | | | |
 
-Choose deliberately among data components, data attachments, `SavedData`, codec-backed config, datapack registry, runtime-only state, `ItemStackTemplate`, and runtime `ItemStack`.
+Choose deliberately among data components, data attachments, global server `SavedData`, dimension-owned `SavedData`, codec-backed config, datapack registry, runtime-only state, an immutable `ItemStackTemplate` with registry-context-deferred component binding, and runtime `ItemStack`.
+
+- Existing `SavedDataType` identifiers and world-relative file paths:
+- Global data moving from overworld storage to `MinecraftServer#getDataStorage`:
+- Dimension-owned data remaining level-scoped:
+- File Fixer Upper or custom world-file move/delete operations:
+- Mandatory backup and copied-world test procedure:
+- Downgrade policy after world-layout migration:
 
 ## 6. Networking contract
 

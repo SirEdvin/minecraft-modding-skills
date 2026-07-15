@@ -92,7 +92,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://github.com/architectury/architectury-api/commit/52b04952efaf77d11b42ce5fef716cd69120ac33
 - https://github.com/Snownee/Jade/commit/7de912d5c29b25bf556d84e2165309dd4e497172
 
-The migration skill was independently authored from the official documentation and real-project port evidence above. Project commits are architectural examples rather than loader contracts; no project source or prose was copied.
+The migration skill was independently authored from official documentation and real-project port evidence. The package's `references/26.1-change-map-and-sources.md` is the authoritative complete provenance index for this skill, including all intervening release primers, Fabric API/Loader/Loom audit indexes, project branches, comparisons, PRs, and reviewed commits. Project ports are architectural examples rather than loader contracts; no project source or prose was copied.
 
 `modrinth-api`:
 

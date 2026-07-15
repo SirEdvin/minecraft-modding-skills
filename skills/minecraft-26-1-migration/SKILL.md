@@ -25,8 +25,8 @@ Do not modify source code until the questions below have answers or explicitly r
 4. **Compatibility policy:** Must old saves, config files, IDs, datapacks, network peers, APIs, or add-ons remain compatible? Which identifiers are public/stable?
 5. **Branch policy:** Direct port, staged incremental port, or a dedicated port branch fed by merges from the maintained old branch?
 6. **Client/server contract:** Universal, client-only, or server-only? Must the artifact launch on a headless dedicated server? Which classes and Mixins are physically client-only?
-7. **Persistence model:** For every stored value, should it be a data component, data attachment, `SavedData`, codec-backed config, datapack registry entry, or runtime-only state?
-8. **Item representation:** Is each item-like value a runtime mutable `ItemStack` or an immutable, registry-independent `ItemStackTemplate` resolved later?
+7. **Persistence model:** For every stored value, should it be a data component, data attachment, global server `SavedData`, dimension-owned `SavedData`, codec-backed config, datapack registry entry, or runtime-only state? Which existing file identifiers and locations must migrate?
+8. **Item representation:** Is each item-like value a runtime mutable `ItemStack` or an immutable `ItemStackTemplate` whose component binding is deferred until registry/world context exists?
 9. **Networking:** For every payload, which phase and direction apply? Must the wire format remain compatible? What server-side validation and thread model are required?
 10. **Rendering:** Which renderers are HUD/GUI, entity, block entity, world/level, baked model, fluid, or direct GPU/OpenGL code? Can JSON/model APIs replace custom rendering?
 11. **Datagen/resources:** Are generated resources committed? Is datagen client-only, unified, or split? Which custom resource schemas and test structures exist?
@@ -66,6 +66,8 @@ Complete `templates/migration-brief.md`. The brief must include:
 - verification matrix and completion criteria.
 
 Do not treat the official 1.21.11→26.1 guide as complete for a 1.21.1 source. Review every intervening NeoForge release/primer or equivalent vanilla/API changes in order: 1.21.2, 1.21.4, 1.21.5, 1.21.6, 1.21.7, 1.21.8, 1.21.9, 1.21.10, 1.21.11, then 26.1.
+
+For Fabric sources earlier than 1.21.11, also record the exact Fabric API, Loader, and Loom versions at each maintained source boundary and review their tag history, Loader changelog, Loom releases, and source diffs. The Fabric 1.21.11→26.1 guide and vanilla primers do not cover cumulative Fabric API/Loader changes from early 1.21.x.
 
 ## Phase 3 — Choose the port strategy
 
@@ -121,7 +123,9 @@ Handle official-name and API renames separately from behavior changes. Audit `Re
 - Use immutable component values with stable equality and appropriate persistent/network codecs.
 - Migrate direct NBT serialization to target `ValueInput`/`ValueOutput` patterns when crossing the 1.21.6 boundary.
 - Preserve stable IDs and add explicit migration/alias/data-fixer handling when save compatibility requires it.
-- Replace definition-time/static `ItemStack` construction with `ItemStackTemplate`, suppliers, or reload/world-time resolution.
+- Classify `SavedData` as global or dimension-owned. In 26.1, global data belongs in `MinecraftServer#getDataStorage`; dimension data remains level-scoped. Preserve stable `SavedDataType` identifiers and decide how old file locations move.
+- Treat File Fixer Upper as an irreversible world-layout migration risk: test only on copied worlds, require backups, and document the downgrade policy before custom file moves or deletions.
+- Replace definition-time/static `ItemStack` construction with `ItemStackTemplate`, suppliers, or reload/world-time resolution. Do not inspect template components before registry/world context binds them.
 - For NeoForge transfer APIs, design around transactional `ResourceHandler`, `ItemAccess`, and `EnergyHandler`; do not mechanically wrap old handlers without defining transaction semantics.
 
 ### Networking
