@@ -3,7 +3,7 @@ name: kubejs-modding
 description: KubeJS Minecraft modpack scripting guidance based on the official KubeJS wiki and source. Use when writing or reviewing KubeJS scripts, startup_scripts, server_scripts, client_scripts, recipe changes, item/block/fluid/entity registry scripts, tags, loot, custom events, Java.type/Java.loadClass usage, ProbeJS typings, mod integrations, reload behavior, server/client safety, or pack-dev automation for Forge, NeoForge, or Fabric modpacks.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # KubeJS Modding
@@ -31,6 +31,7 @@ Use this skill to implement or review KubeJS scripts for Minecraft modpacks. Pre
 
 - Use `/reload` for server scripts and data/resource changes that participate in datapack reload.
 - Restart the game/server after changing startup scripts or registries. Registry changes cannot be safely hot-reloaded.
+- KubeJS-specific `/kubejs reload startup_scripts`, `/kubejs reload server_scripts`, and `/kubejs reload client_scripts` commands can reevaluate top-level code, but they do not rerun registration or replace listeners already registered. Do not treat them as lifecycle substitutes.
 - Use `/kubejs errors` or the current KubeJS error command for script errors when available.
 - Check `logs/kubejs/server.log`, `logs/kubejs/client.log`, normal latest logs, and crash reports after changes.
 - Use ProbeJS to generate typings and inspect available globals, events, classes, and addon APIs for the current pack.
@@ -100,6 +101,7 @@ StartupEvents.registry('item', event => {
 - Use raw JSON in `kubejs/data/<namespace>` for complex loot tables, advancements, predicates, worldgen, or mod-specific data when JS wrappers would obscure the schema.
 - Keep generated JSON deterministic and organized by namespace/path.
 - Check data pack load errors after edits; a single invalid JSON file can invalidate a larger reload.
+- Tags are registry-specific: a block tag does not automatically make the corresponding block item a valid item-tag recipe ingredient. Tags also cannot distinguish NBT/data-component variants.
 
 ## Client Integration
 

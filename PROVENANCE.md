@@ -47,6 +47,31 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://github.com/KubeJS-Mods/Rhino
 - https://github.com/Prunoideae/ProbeJS
 
+`minecraft-modpack-authoring`:
+
+- https://packwiz.infra.link/
+- https://packwiz.infra.link/tutorials/creating/getting-started/
+- https://packwiz.infra.link/tutorials/creating/adding-mods/
+- https://packwiz.infra.link/tutorials/installing/packwiz-installer/
+- https://packwiz.infra.link/reference/commands/packwiz/
+- https://github.com/packwiz/packwiz (reviewed at `dfd8b68a4796c763e25bad50265ea1f1233e24f1`)
+- https://github.com/packwiz/packwiz-spec
+- https://github.com/packwiz/packwiz-example-pack
+- https://github.com/packwiz/packwiz-installer
+- https://kubejs.com/wiki/
+- https://github.com/KubeJS-Mods/KubeJS (reviewed at `84b072de677c2da12e150e34f2f300a669a2dff3`)
+- https://docs.minecraftforge.net/en/1.20.x/misc/config/
+- https://docs.neoforged.net/docs/misc/config/
+- https://docs.neoforged.net/docs/1.21.1/misc/config/
+- https://raw.githubusercontent.com/MinecraftForge/MinecraftForge/1.20.x/fmlcore/src/main/java/net/minecraftforge/fml/config/ModConfig.java
+- https://raw.githubusercontent.com/MinecraftForge/MinecraftForge/1.20.x/fmlcore/src/main/java/net/minecraftforge/fml/config/ConfigFileTypeHandler.java
+- https://raw.githubusercontent.com/neoforged/NeoForge/1.21.x/src/main/java/net/neoforged/neoforge/server/ServerLifecycleHooks.java
+- https://raw.githubusercontent.com/neoforged/FancyModLoader/main/loader/src/main/java/net/neoforged/fml/config/ConfigTracker.java
+- https://docs.fabricmc.net/develop/data-generation/setup
+- https://minecraft.wiki/w/Data_pack
+- https://www.minecraft.net/en-us/usage-guidelines
+- https://support.curseforge.com/en/support/solutions/articles/9000197913-non-curseforge-mods
+
 `modrinth-api`:
 
 - https://docs.modrinth.com/api/
