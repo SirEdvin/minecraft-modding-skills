@@ -4,6 +4,7 @@ Reusable agent skills for Minecraft Java mod development, modpack authoring, loa
 
 ## Skills
 
+- `minecraft-26-1-migration` — decision-gated, source-backed migration of Fabric, NeoForge, and multi-loader mods from Minecraft 1.21.x to the 26.1.x line.
 - `minecraft-modpack-authoring` — reproducible Packwiz packs, configuration, KubeJS integration, datapacks, quests, exports, and client/server validation.
 - `kubejs-modding` — detailed KubeJS script lifecycle, recipes, registries, tags, integrations, and debugging.
 - `fabric-modding` — Fabric mod development.
@@ -25,14 +26,14 @@ Install one skill with skills.sh:
 
 ```bash
 npx -y skills add SirEdvin/minecraft-modding-skills \
-  --skill minecraft-modpack-authoring --agent '*' --yes
+  --skill minecraft-26-1-migration --agent '*' --yes
 ```
 
 Inspect or install with Hermes:
 
 ```bash
-hermes skills inspect SirEdvin/minecraft-modding-skills/skills/minecraft-modpack-authoring
-hermes skills install SirEdvin/minecraft-modding-skills/skills/minecraft-modpack-authoring
+hermes skills inspect SirEdvin/minecraft-modding-skills/skills/minecraft-26-1-migration
+hermes skills install SirEdvin/minecraft-modding-skills/skills/minecraft-26-1-migration
 ```
 
 Multi-file skills should be installed from the repository path so their `references/` files remain available.
