@@ -79,9 +79,9 @@ For an existing unmanaged launcher instance, do not blindly commit the whole ins
 Prefer stable project slugs, project URLs, or exact version URLs over ambiguous search terms:
 
 ```bash
-packwiz modrinth install sodium
-packwiz modrinth install https://modrinth.com/mod/sodium/version/<version-id>
-packwiz curseforge install jei
+packwiz modrinth add sodium
+packwiz modrinth add https://modrinth.com/mod/sodium/version/<version-id>
+packwiz curseforge add jei
 packwiz remove sodium
 packwiz pin jei
 packwiz unpin jei
@@ -90,7 +90,7 @@ packwiz update --all
 packwiz refresh
 ```
 
-Short aliases such as `packwiz mr add` and `packwiz cf add` exist, but use full commands in automation and documentation when clarity matters.
+Short aliases such as `packwiz mr add` and `packwiz cf add` exist. Older tutorials and some binaries use `install` or `get` aliases; prefer the current `add` spelling and inspect the installed binary's `--help` before scripting it.
 
 Packwiz can resolve required dependencies and reject incompatible game versions, but this does not prove that the selected combination starts or behaves correctly. After every dependency-changing operation:
 
@@ -123,7 +123,7 @@ Classify each setting by ownership and lifecycle before copying files:
 - **Server/world:** authoritative gameplay settings, often stored per-world and synchronized by Forge/NeoForge when the mod uses their server config type.
 - **Generated/runtime:** caches, logs, launcher state, player data, worlds, crash reports, backups, and transient generated files. Exclude these.
 
-For Forge and NeoForge packs, `config/` applies to the instance or server. World-specific server configs live under the world's `serverconfig/`. Many packs place selected server config files in `defaultconfigs/` so newly created worlds receive the intended defaults; verify that behavior on the exact loader/mod version and test a fresh world. Updating defaults does not necessarily rewrite existing worlds.
+On Forge 1.20.x, typed `SERVER` configs live under the world's `serverconfig/`; files in `defaultconfigs/` seed missing world configs when the world is first created. Current NeoForge differs: the global `config/` server file is the base and a same-named world `serverconfig/` file is a per-world override. NeoForge can still seed missing files from `defaultconfigs/`. This lifecycle has changed across loader versions, so verify the exact branch and test a fresh world plus an existing world. Later changes to `defaultconfigs/` do not continuously synchronize already-created files.
 
 Fabric has no single loader-wide configuration-file contract comparable to Forge/NeoForge config types. Follow each mod's own documentation and implementation, and test physical-side behavior.
 
@@ -141,6 +141,8 @@ Use KubeJS when JSON datapacks/configs cannot clearly express pack integration, 
 KubeJS APIs change substantially between Minecraft/KubeJS versions and addons. Before editing, identify exact KubeJS, Rhino, ProbeJS, and integration versions. Prefer generated ProbeJS typings and project-local helpers over snippets copied from another pack.
 
 Assign stable IDs to important recipes, use targeted removals, keep client classes out of common/server scripts, and restart after startup-script or registry changes. Use `/reload` only for reloadable server/data content; use a client resource reload only for reloadable client resources. Inspect KubeJS logs and verify the result in a recipe viewer and through actual gameplay.
+
+KubeJS-specific script reload commands can reevaluate top-level code, but they do not rerun registry work or replace listeners that were already registered. Do not use `/kubejs reload startup_scripts`, `/kubejs reload server_scripts`, or `/kubejs reload client_scripts` as substitutes for the real lifecycle above.
 
 ## Datapacks, Resource Packs, Quests, And World Data
 

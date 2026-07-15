@@ -63,6 +63,10 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://docs.minecraftforge.net/en/1.20.x/misc/config/
 - https://docs.neoforged.net/docs/misc/config/
 - https://docs.neoforged.net/docs/1.21.1/misc/config/
+- https://raw.githubusercontent.com/MinecraftForge/MinecraftForge/1.20.x/fmlcore/src/main/java/net/minecraftforge/fml/config/ModConfig.java
+- https://raw.githubusercontent.com/MinecraftForge/MinecraftForge/1.20.x/fmlcore/src/main/java/net/minecraftforge/fml/config/ConfigFileTypeHandler.java
+- https://raw.githubusercontent.com/neoforged/NeoForge/1.21.x/src/main/java/net/neoforged/neoforge/server/ServerLifecycleHooks.java
+- https://raw.githubusercontent.com/neoforged/FancyModLoader/main/loader/src/main/java/net/neoforged/fml/config/ConfigTracker.java
 - https://docs.fabricmc.net/develop/data-generation/setup
 - https://minecraft.wiki/w/Data_pack
 - https://www.minecraft.net/en-us/usage-guidelines

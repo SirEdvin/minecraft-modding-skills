@@ -28,6 +28,18 @@ packwiz refresh
 
 `pack.toml` stores pack identity, version, Minecraft and loader versions, and the index hash. `index.toml` stores indexed paths and hashes. Current Packwiz source declares pack format `packwiz:1.1.0`, but agents should preserve the format written by the installed tool and use supported migrations rather than forcing this value.
 
+For non-interactive automation, provide exact versions rather than resolving latest during a release build:
+
+```bash
+packwiz init \
+  --name "Example Pack" \
+  --author "Author" \
+  --version "1.0.0" \
+  --mc-version "1.21.1" \
+  --modloader fabric \
+  --fabric-version "<exact-loader-version>"
+```
+
 Useful inspection:
 
 ```bash
@@ -39,11 +51,11 @@ packwiz settings --help
 ## Add External Projects
 
 ```bash
-packwiz modrinth install <slug-or-url>
-packwiz curseforge install <slug-or-url>
+packwiz modrinth add <slug-or-url>
+packwiz curseforge add <slug-or-url>
 ```
 
-Packwiz also accepts exact Modrinth version URLs/IDs and CurseForge file URLs/IDs. Prefer an exact project or version URL in automation. Search-result selection may be interactive, and global `--yes` accepts defaults that may choose an unintended result.
+Current generated command references use `add`; older tutorials and some binaries expose `install` or `get` aliases. Inspect `packwiz modrinth --help` and `packwiz curseforge --help` before scripting a particular binary. Packwiz also accepts exact Modrinth version URLs/IDs and CurseForge file URLs/IDs. Prefer an exact project or version URL in automation. Search-result selection may be interactive, and global `--yes` accepts defaults that may choose an unintended result.
 
 Packwiz prompts for required dependencies that are not installed and checks Minecraft/loader compatibility. Inspect every dependency it adds. Metadata resolution does not detect all runtime incompatibilities or duplicate-function mods.
 
@@ -205,7 +217,7 @@ The installer can be a launcher pre-launch step or part of server provisioning. 
 
 A minimal Packwiz CI job should:
 
-1. install a pinned Packwiz release;
+1. install a Packwiz binary pinned by release or source commit and verify its checksum;
 2. run `packwiz refresh`;
 3. fail if tracked manifest/index files changed;
 4. export supported archive formats;

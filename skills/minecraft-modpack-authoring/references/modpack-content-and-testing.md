@@ -29,12 +29,12 @@ A common config is not automatically authoritative or synchronized merely becaus
 
 ### NeoForge
 
-NeoForge documentation includes STARTUP, CLIENT, COMMON, and SERVER types. Current docs and versioned docs differ in details, so use the page for the target Minecraft line.
+NeoForge documentation includes STARTUP, CLIENT, COMMON, and SERVER types. Current docs and versioned docs differ in details, so use the page and source branch for the target Minecraft line.
 
 - Current: https://docs.neoforged.net/docs/misc/config/
 - Minecraft 1.21/1.21.1: https://docs.neoforged.net/docs/1.21.1/misc/config/
 
-NeoForge warns that unsynchronized startup settings should not enable/disable content in ways that can desynchronize clients and servers. SERVER configs can be overridden per world and are synchronized to clients.
+NeoForge warns that unsynchronized startup settings should not enable/disable content in ways that can desynchronize clients and servers. In current NeoForge, a `SERVER` config in global `config/` is the base; a same-named file under `<world>/serverconfig/` overrides it for that world and is synchronized to clients. Missing files can be seeded from `defaultconfigs/`. Verify this against the exact NeoForge branch because older Forge/NeoForge lifecycles differ.
 
 ### Fabric
 
@@ -46,8 +46,8 @@ Use these pack-authoring rules:
 
 - Put intentionally shipped instance/server configuration in `config/`.
 - Treat `<world>/serverconfig/` as existing-world state unless the pack intentionally ships a world template.
-- Many Forge/NeoForge pack workflows use `defaultconfigs/` to seed corresponding server configs for newly created worlds. This is a pack/loader behavior to verify on the exact target; do not assume it updates existing worlds.
-- To change an existing world's authoritative server config, migrate that world's `serverconfig/` explicitly and back it up first.
+- Forge 1.20.x and current NeoForge use `defaultconfigs/` as a first-creation seed for missing config files, not as an ongoing synchronization layer. Verify the exact target branch and filename.
+- To change an existing Forge world's authoritative server config or an existing NeoForge world override, migrate that world's `serverconfig/` explicitly and back it up first. On current NeoForge, a world without an override continues to use the global base file.
 - Test a newly created world and an upgraded copied world separately.
 
 A safe capture workflow:
@@ -113,6 +113,7 @@ Rules:
 - `/reload` reloads many data-driven systems, but dynamic-registry/worldgen changes generally require a world/server restart and can change world compatibility.
 - Match `pack_format` to the exact Minecraft version. Pack format numbers change frequently.
 - Treat malformed data as a release blocker; a single invalid file can make world loading fail or enter safe mode.
+- A loose datapack under one world's `datapacks/` is world state. Do not assume a loader automatically installs an arbitrary loose datapack into every new world; use a documented global-pack mechanism, KubeJS's built-in data layer, or a small content mod when the pack requires global application.
 
 When KubeJS generates equivalent datapack content, decide one owner. Do not define the same recipe/tag/loot ID in both raw JSON and scripts unless the override order is intentional and tested.
 
@@ -128,7 +129,7 @@ Use resource packs for pack-owned language, models, textures, sounds, fonts, spl
 
 ## Quest And Progression Data
 
-Quest systems are mod-specific. FTB Quests commonly stores editable data beneath configuration/quest directories and may use SNBT; other systems use JSON, KubeJS, databases, or world data. Use the exact mod's documentation and inspect a generated minimal quest book before editing by hand.
+Quest systems are mod-specific. FTB Quests 1.20.1 releases commonly store definitions as SNBT under `config/ftbquests/quests` while team progress lives in the world's `ftbquests/`; current development has moved serialization toward JSON5. Other systems use JSON, KubeJS, databases, datapacks, or world data. Use the exact mod version's documentation/source and inspect a generated minimal quest book before editing by hand.
 
 Treat IDs as public interfaces:
 
