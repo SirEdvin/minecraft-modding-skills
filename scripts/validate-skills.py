@@ -106,17 +106,15 @@ for skill in sorted(skills_dir.iterdir()):
         errors.append(f"{path}: description too long ({len(description)})")
     if frontmatter.get("license") != "MIT":
         errors.append(f"{path}: license must be MIT")
+
     if "compatibility" in frontmatter and (
         not isinstance(compatibility, str)
         or not compatibility.strip()
         or len(compatibility) > 500
     ):
         errors.append(f"{path}: compatibility must contain 1..500 characters")
-    if metadata is not None and (
-        not isinstance(metadata, dict)
-        or any(not isinstance(key, str) or not isinstance(value, str) for key, value in metadata.items())
-    ):
-        errors.append(f"{path}: metadata must map strings to strings")
+    if metadata is not None and not isinstance(metadata, dict):
+        errors.append(f"{path}: metadata must be a mapping")
     if not isinstance(version, str) or not SEMVER.fullmatch(version):
         errors.append(f"{path}: metadata.version must be clean SemVer")
     if "allowed-tools" in frontmatter and not isinstance(frontmatter["allowed-tools"], str):
