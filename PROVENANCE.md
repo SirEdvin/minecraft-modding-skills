@@ -94,6 +94,34 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 
 The migration skill was independently authored from official documentation and real-project port evidence. The package's `references/26.1-change-map-and-sources.md` is the authoritative complete provenance index for this skill, including all intervening release primers, Fabric API/Loader/Loom audit indexes, project branches, comparisons, PRs, and reviewed commits. Project ports are architectural examples rather than loader contracts; no project source or prose was copied.
 
+`stonecutter-multiversion`:
+
+- https://stonecutter.kikugie.dev/
+- https://stonecutter.kikugie.dev/wiki/index
+- https://stonecutter.kikugie.dev/wiki/start/
+- https://stonecutter.kikugie.dev/wiki/start/settings
+- https://stonecutter.kikugie.dev/wiki/start/builds
+- https://stonecutter.kikugie.dev/wiki/start/comments
+- https://stonecutter.kikugie.dev/wiki/config/settings
+- https://stonecutter.kikugie.dev/wiki/config/controller
+- https://stonecutter.kikugie.dev/wiki/config/build
+- https://stonecutter.kikugie.dev/wiki/config/params
+- https://stonecutter.kikugie.dev/wiki/config/properties
+- https://stonecutter.kikugie.dev/wiki/config/handlers
+- https://stonecutter.kikugie.dev/wiki/tips/multiloader
+- https://stonecutter.kikugie.dev/wiki/tips/resource-processing
+- https://stonecutter.kikugie.dev/wiki/tips/interface-injection
+- https://stonecutter.kikugie.dev/wiki/faq
+- https://stonecutter.kikugie.dev/blog/changes/0.9
+- https://plugins.gradle.org/plugin/dev.kikugie.stonecutter
+- https://codeberg.org/stonecutter/docs (reviewed at `5b34b7d2761fa1c9e13f776ba55750b3695bc146`)
+- https://codeberg.org/stonecutter/stonecutter (reviewed at `fd815381d03457917ed849894b6350e15cc5fc92`)
+- https://codeberg.org/stonecutter/template-fabric (reviewed at `c01bd28d4c590e2825924582527a660f2c2e45f6`)
+- https://codeberg.org/stonecutter/template-neoforge (reviewed at `e7536b30e8e99cf2f7435d9062ce189c13a719e4`)
+- https://codeberg.org/stonecutter/template-multiloader (reviewed at `a3d36a17322aa20e009c175e8ec908b237d7ccab`)
+
+The Stonecutter skill was independently distilled from official documentation, current plugin source, and official template behavior. Documented task names and version-switch/reset semantics were smoke-tested with Stonecutter 0.9.7 and Gradle 9.6.1 in a disposable copy of the official Fabric template; no upstream prose or source was copied.
+
 `modrinth-api`:
 
 - https://docs.modrinth.com/api/
