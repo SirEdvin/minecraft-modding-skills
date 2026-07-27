@@ -13,6 +13,7 @@
         "modrinth-api",
         "neoforge-legacy-modding",
         "neoforge-modding",
+        "stonecutter-multiversion",
         "testiarium-gametest"
       ]
     }

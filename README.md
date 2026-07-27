@@ -6,6 +6,7 @@ Reusable agent skills for Minecraft Java mod development, modpack authoring, loa
 
 - `minecraft-26-1-migration` — decision-gated, source-backed migration of Fabric, NeoForge, and multi-loader mods from Minecraft 1.21.x to the 26.1.x line.
 - `minecraft-modpack-authoring` — reproducible Packwiz packs, configuration, KubeJS integration, datapacks, quests, exports, and client/server validation.
+- `stonecutter-multiversion` — source-backed setup, daily development, testing, releases, and long-term maintenance for Stonecutter multi-version and multi-loader mods.
 - `kubejs-modding` — detailed KubeJS script lifecycle, recipes, registries, tags, integrations, and debugging.
 - `fabric-modding` — Fabric mod development.
 - `neoforge-modding` — current NeoForge mod development.
