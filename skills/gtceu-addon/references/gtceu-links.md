@@ -9,15 +9,6 @@ can help navigation but are not authoritative signatures.
 - [Official 1.20.1 wiki](https://gregtechceu.github.io/GregTech-Modern/1.20.1/).
 - [GTCEu Maven](https://maven.gtceu.com).
 
-The representative public Java repositories
-[TemplateProject](https://github.com/SirEdvin/TemplateProject/tree/042d296e255d6a9e75e1d2f40da9937810e92004)
-and [Minecraft-Modding-Libs](https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c)
-were inspected through tracked paths and tracked-content searches for GTCEu,
-GregTech, KubeJS, Packwiz, and Modrinth. Neither contains tracked GTCEu addon
-integration at those commits. Their Java build layouts are not GTCEu usage proof;
-the official addon template above is the applicable example. No game launch or
-addon compilation was performed for this documentation audit.
-
 ## Retained community navigation (not signature evidence)
 
 These original discovery links are retained, but were not independently audited

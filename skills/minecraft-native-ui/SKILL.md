@@ -152,7 +152,7 @@ Invoke the repository’s full build through the `terminal` tool, then open each
 
 ## Source Leads
 
-The branch list below is retained as discovery guidance, not immutable evidence for every current API. The linked version-boundary reference records this audit’s pinned project evidence. Re-resolve branches before implementing 26.1 code.
+The branch list below is retained as discovery guidance, not immutable evidence for every current API. The linked version-boundary reference separates menu, network, and rendering contracts. Re-resolve branches before implementing 26.1 code.
 
 - Super Factory Manager: `https://github.com/TeamDman/SuperFactoryManager` (`1.20.1`, `1.21.1`, `26.1.2` branches), including label gun, text editors, canvas, logs, examples, diagnostics, widgets, and manager menus.
 - CC:Tweaked: `https://github.com/cc-tweaked/CC-Tweaked` (`mc-1.20.x`, `mc-1.21.x`, `mc-26.1` branches).

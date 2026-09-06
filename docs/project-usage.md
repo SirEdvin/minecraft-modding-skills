@@ -42,29 +42,6 @@ Use file-reading and search tools on settings, build scripts, version catalogs, 
 
 Before commands that configure a build or rewrite sources, inspect `git status --short --branch`. Discovery itself can run Gradle configuration code and write generated files. For an audit, use a disposable checkout of the reviewed revision, not the user's active tree. Keep full build logs outside the contribution and summarize errors rather than dumping them into agent context.
 
-## Example A: flat multi-loader template
-
-Reviewed source: [SirEdvin/TemplateProject at 042d296](https://github.com/SirEdvin/TemplateProject/tree/042d296e255d6a9e75e1d2f40da9937810e92004).
-
-- [Settings](https://github.com/SirEdvin/TemplateProject/blob/042d296e255d6a9e75e1d2f40da9937810e92004/settings.gradle.kts) defines one Stonecutter tree at the root with loader-suffixed nodes: 1.20.1 Fabric/Forge and 1.21.1 Fabric/NeoForge.
-- The build script is selected per loader, while the logical Minecraft version is registered separately from the node name.
-- [Controller](https://github.com/SirEdvin/TemplateProject/blob/042d296e255d6a9e75e1d2f40da9937810e92004/stonecutter.gradle.kts) selects `1.21.1-fabric` as active, tags properties by version/loader, and defines loader constants.
-- That revision pins Stonecutter 0.9.7; do not upgrade it merely because a skill's smoke fixture uses 0.9.8.
-- For a cross-loader source fix: load Stonecutter plus Fabric, legacy Forge, and modern NeoForge guidance as the changed code demands. For a Fabric-only metadata change, do not load unrelated addon or pack skills.
-
-## Example B: modular library repository
-
-Reviewed source: [SirEdvin/Minecraft-Modding-Libs at 86bfe0b](https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c).
-
-- [Settings](https://github.com/SirEdvin/Minecraft-Modding-Libs/blob/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c/settings.gradle.kts) creates separate non-root Stonecutter trees for Broccolium, Testiarium, Tweakium, and Peripheralium. `typed-peripheral-api` is separately included rather than being another versioned tree.
-- Each tree has common/root, Fabric, and `forge` branches with 1.20.1 and 1.21.1 nodes. A branch name is not proof of its runtime loader.
-- [Testiarium's Forge-branch build](https://github.com/SirEdvin/Minecraft-Modding-Libs/blob/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c/projects/testiarium/forge/build.gradle.kts) selects legacy Forge for 1.20.1 and NeoForge for 1.21.1. It selects Java 17/21 separately and wires different source sets for unit tests, GameTests, and ComputerCraft tests.
-- The repository root applies Java, but it is not a Stonecutter controller root. The prohibition against applying Java to a controller must not be generalized to every repository root.
-- [CI](https://github.com/SirEdvin/Minecraft-Modding-Libs/blob/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c/.github/workflows/ci.yml) runs the repository build. It does not demonstrate that an interactive client or every registered GameTest ran.
-- For Testiarium work, combine its skill with the corresponding loader and Stonecutter. Discover paths containing library, branch, and version; do not reuse an old `projects/testiarium-core` path from a different revision.
-
-These are architectural examples, not universal templates or evidence that every skill is used by both projects. No GTCEu, KubeJS, Packwiz, or 26.1 migration is implied by these examples; those packages require their own applicability checks and source evidence.
-
 ## Execution and evidence contract
 
 Invoke through the agent's terminal tool from the target repository root (use the checked-in Windows wrapper on Windows):

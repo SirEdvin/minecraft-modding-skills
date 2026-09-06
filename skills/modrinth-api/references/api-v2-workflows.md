@@ -32,7 +32,7 @@ curl URL globbing. `--fail-with-body` requires curl 7.76+; check the installed
 version or use `--fail` on older clients.
 
 ```bash
-UA='SirEdvin/minecraft-modding-skills-audit (https://github.com/SirEdvin/minecraft-modding-skills)'
+UA='your-application/1.0 (your-public-contact-url)'
 curl --fail-with-body --silent --show-error --max-time 30 --get   -H "User-Agent: $UA"   --data-urlencode 'query=modmenu'   --data-urlencode 'limit=5'   --data-urlencode 'facets=[["categories:fabric"],["project_type:mod"],["versions:1.21.1"]]'   'https://api.modrinth.com/v2/search'
 
 curl --fail-with-body --silent --show-error --max-time 30 --get   -H "User-Agent: $UA"   --data-urlencode 'loaders=["fabric"]'   --data-urlencode 'game_versions=["1.21.1"]'   --data-urlencode 'include_changelog=false'   'https://api.modrinth.com/v2/project/modmenu/version'
@@ -102,7 +102,7 @@ The staging base `https://staging-api.modrinth.com` is a distinct environment,
 not a production mirror or a safe target for unrequested writes. Do not transfer
 production credentials or assume production IDs exist there.
 
-## Sources and representative usage
+## Official sources
 
 - [Official API overview, auth, rate limits and UA](https://docs.modrinth.com/api/).
 - [Project version query contract](https://docs.modrinth.com/api/operations/getprojectversions/).
@@ -111,13 +111,3 @@ production credentials or assume production IDs exist there.
   Fabric 1.21.1 version list were exercised without credentials during this audit;
   no artifacts were downloaded and no writes were issued. Results are dynamic,
   not a permanently pinned fixture or fabricated example response.
-- [Minecraft-Modding-Libs at 86bfe0b](https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c):
-  `gradle/libs.versions.toml` declares `maven.modrinth:modmenu`;
-  `projects/broccolium/fabric/build.gradle.kts`,
-  `projects/peripheralium/fabric/build.gradle.kts`, and
-  `projects/tweakium/fabric/build.gradle.kts` configure Modrinth Maven for 1.21.1.
-  This is real **Maven dependency usage**, not evidence those projects call v2
-  REST or publish to Modrinth. The API can inspect a candidate, not replace the
-  project's dependency coordinates or upgrade its pinned version.
-- [TemplateProject at 042d296](https://github.com/SirEdvin/TemplateProject/tree/042d296e255d6a9e75e1d2f40da9937810e92004):
-  tracked files/content contained no Modrinth reference at the reviewed commit.

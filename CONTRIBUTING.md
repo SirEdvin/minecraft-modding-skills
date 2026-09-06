@@ -15,7 +15,7 @@ Do not modify example projects merely to make skill guidance appear correct. Ins
 - Aim for a concise always-loaded workflow. Move substantial API tables, examples, and source maps to directly linked package-local `references/`; reusable code belongs in `scripts/` and needs tests.
 - Individual package installs must work without repository-level documents or adjacent skill directories. Other package names may be optional recommendations, not implicit local-file dependencies.
 - Match examples to an explicit game/loader/mapping/tool version. Prefer exact project configuration, official versioned docs, release source/tests, then pinned examples. Label contradictions and unresolved claims.
-- Use imperative decision rules that explain the failure they avoid. Keep project-specific observations labeled as examples, not universal Minecraft rules.
+- Use imperative decision rules that explain the failure they avoid. Do not embed maintainer project names, namespaces, URLs, task paths, revisions, or applicability inventories in generic skills. Distill the reusable lesson; retain project-specific implementation references only in `testiarium-gametest`. Keep execution evidence in PR/test reports rather than permanent skill instructions.
 - Preserve useful domain detail while removing repetition, stale paths, fabricated tasks, and unqualified latest-version advice.
 - Do not copy unlicensed skill prose. Record independently researched sources in `PROVENANCE.md` or an explicitly linked source map.
 

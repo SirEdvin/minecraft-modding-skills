@@ -42,7 +42,7 @@ From the repository root, inspect `settings.gradle(.kts)`, `stonecutter.gradle(.
 ./gradlew build
 ```
 
-Never guess generated task names or project paths. Read them from `projects` and `tasks --all`, especially when a project separates logical versions from node names. For multiple library trees, first read [real-project topology and task discovery](references/project-topology.md); a Gradle repository root is not necessarily a Stonecutter controller.
+Never guess generated task names or project paths. Read them from `projects` and `tasks --all`, especially when a project separates logical versions from node names. For multiple library trees, first read [project topology and task discovery](references/project-topology.md); a Gradle repository root is not necessarily a Stonecutter controller.
 
 Load detailed topics on demand with `skill_view(name="stonecutter-multiversion", file_path="references/<file>")`:
 - `references/properties-and-data-setup.md`: load for property resolution, typed/raw access, JSON schemas, CI matrices, inheritance, or 0.10 accessor migration.

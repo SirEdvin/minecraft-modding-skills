@@ -51,6 +51,6 @@ and read back the exact target after a requested mutation.
 
 [Endpoint contracts and safe query examples](references/api-v2-workflows.md)
 contains executable read-only curl examples, file-verification rules, official
-sources and representative project evidence. API v2 tag endpoints have distinct
+sources and endpoint-specific verification guidance. API v2 tag endpoints have distinct
 schemas; do not treat all responses as objects with a `name` field or infer v3
 fields from a moving docs page. Handle 401/403/404/410 and empty arrays explicitly.

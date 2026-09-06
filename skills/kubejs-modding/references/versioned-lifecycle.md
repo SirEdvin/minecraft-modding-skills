@@ -52,15 +52,5 @@ mechanism. Java source inspection or a successful Node parser does not exercise
 Rhino or a plugin registration hook. Consult the pinned source's plugin API for
 compiled addons; do not place Java addon code in `startup_scripts`.
 
-## Representative project scope
-
-Tracked-tree and tracked-content searches in
-[TemplateProject at 042d296](https://github.com/SirEdvin/TemplateProject/tree/042d296e255d6a9e75e1d2f40da9937810e92004)
-and [Minecraft-Modding-Libs at 86bfe0b](https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c)
-found no tracked KubeJS pack scripts or integration references. The official 2001
-implementation above and version-labelled wiki examples are the applicable
-examples; neither Java project is claimed to validate KubeJS runtime behavior.
-No Rhino/game runtime was launched during this audit.
-
 Additional official navigation: [folder structure](https://kubejs.com/wiki/folder-structure),
 [recipe tutorial](https://kubejs.com/wiki/tutorials/recipes).

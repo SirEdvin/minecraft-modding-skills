@@ -48,14 +48,3 @@ snapshot of `pack.toml`, its index, metadata and authored files atomically. Neve
 publish a new manifest before its referenced content is available. A checksum
 chain does not keep an upstream CDN alive; retain permitted artifacts or document
 availability limitations. No public publication is part of a source audit.
-
-## Representative Java projects
-
-Tracked-tree and tracked-content searches in
-[TemplateProject at 042d296](https://github.com/SirEdvin/TemplateProject/tree/042d296e255d6a9e75e1d2f40da9937810e92004)
-and [Minecraft-Modding-Libs at 86bfe0b](https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/86bfe0b75d0dceb26e713a6c3bdcc91ec74eac2c)
-found no Packwiz manifest or tracked Packwiz/KubeJS integration. Their Gradle and
-loader metadata are compiled-mod examples, not pack install/launch evidence.
-Use the official example above rather than inventing pack usage in these projects.
-No client/server launch, export CLI run, or existing-world migration was performed
-in the documentation audit.
