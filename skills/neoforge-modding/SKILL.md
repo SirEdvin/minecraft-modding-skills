@@ -1,9 +1,10 @@
 ---
 name: neoforge-modding
-description: NeoForge Minecraft mod development guidance based on the official NeoForge docs. Use when working on NeoForge mods, Minecraft mod loaders, Java modding projects, Gradle MDK/ModDevGradle/NeoGradle setup, registries, DeferredRegister, events, client/server sides, items, blocks, data generation, resources, custom payload networking, or dedicated-server safety.
+description: Develop NeoForge mods with version-matched APIs.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
+  author: "minecraft-modding-skills contributors"
 ---
 
 # NeoForge Modding
@@ -13,7 +14,8 @@ Use this skill to implement or review Minecraft mods targeting NeoForge. Prefer 
 ## First Checks
 
 - Confirm the Minecraft and NeoForge versions from `gradle.properties`, `build.gradle`, `settings.gradle`, or generated MDK files.
-- Confirm the mod id, package, and Java version; modern NeoForge 1.21.x expects Java 21.
+- Confirm the mod id, package, and Java version: 1.20.1 uses Java 17, 1.21.x Java 21, and 26.1 Java 25. Do not infer loader or version from a directory named `forge`.
+- Read [version contracts and inspected projects](references/version-contracts.md) before copying current-doc APIs into 1.21.1. Resolve actual source roots, metadata expansion, and node-qualified tasks through settings/build/convention plugins.
 - Prefer the generated Gradle workflow: `./gradlew build`, `./gradlew runClient`, `./gradlew runServer`, and datagen runs configured by the project.
 - Reload Gradle after changing Gradle files; avoid editing `build.gradle`/`settings.gradle` when `gradle.properties` is sufficient.
 - Always test server safety for common code, even for client-focused mods.
@@ -21,7 +23,7 @@ Use this skill to implement or review Minecraft mods targeting NeoForge. Prefer 
 ## Project Structure
 
 - Keep common code free of `net.minecraft.client` imports.
-- Put client-only setup behind physical-client gates: a separate `@Mod(value = MOD_ID, dist = Dist.CLIENT)` class or client-only event subscriber.
+- Put client-only setup behind physical-client gates: a client-only event subscriber, or a separate `@Mod(value = MOD_ID, dist = Dist.CLIENT)` class **where the target FML supports it**. Older targets need their matching subscriber annotation/bus syntax.
 - Use `src/main/java` for code, `src/main/resources/assets/<modid>` for client assets, and `src/main/resources/data/<modid>` for gameplay data.
 - Use generated resources under `src/generated/resources` when the Gradle project is configured for datagen.
 - Keep registration classes small and grouped by registry type, e.g. `ModItems`, `ModBlocks`, `ModCreativeTabs`.
@@ -34,15 +36,11 @@ Use this skill to implement or review Minecraft mods targeting NeoForge. Prefer 
 - Do not instantiate registry objects outside registration; blocks, items, entities, tabs, data components, and similar entries must be singleton registry entries.
 - Use the mod id namespace for every custom `Identifier`/resource location and keep registry names lowercase snake_case.
 
-Typical registration shape:
+Official 1.21.1 item-helper shape (also prefer ID-supplying helpers on later targets):
 
 ```java
 public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);
-public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.register(
-    "example_item",
-    registryName -> new Item(new Item.Properties()
-        .setId(ResourceKey.create(Registries.ITEM, registryName)))
-);
+public static final Supplier<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item");
 
 public ExampleMod(IEventBus modBus) {
     ModItems.ITEMS.register(modBus);
@@ -51,9 +49,9 @@ public ExampleMod(IEventBus modBus) {
 
 ## Items And Blocks
 
-- For items, always set the resource key through `Item.Properties#setId`; configure stack size, durability, rarity, food, cooldowns, and data components through properties when possible.
+- From 1.21.2, item/block properties require IDs; use loader helpers that supply them, or set them explicitly before construction. Do not copy `Item.Properties#setId` into 1.21.1, where it does not exist. Configure supported behavior through properties/components.
 - Treat `ItemStack` as mutable; call `copy()` or `copyWithCount()` before mutating stacks that may be shared or treated as immutable.
-- For blocks, use `DeferredRegister.createBlocks(MOD_ID)` and set the resource key through `BlockBehaviour.Properties#setId`.
+- For blocks, use `DeferredRegister.createBlocks(MOD_ID)`; on ID-requiring targets use a helper that supplies the key or `BlockBehaviour.Properties#setId` before construction.
 - Register a matching `BlockItem` if a block must appear in inventories or be placeable by players.
 - Add items to existing creative tabs with `BuildCreativeModeTabContentsEvent`; register custom `CreativeModeTab` entries through a deferred register.
 - Put models, blockstates, item models, lang entries, recipes, tags, and loot tables in assets/data or datagen providers instead of hardcoding them.
@@ -70,7 +68,7 @@ public ExampleMod(IEventBus modBus) {
 ## Sides
 
 - Use `level.isClientSide()` for logical-side game logic decisions; run authoritative gameplay logic only when it is `false`.
-- Use `FMLEnvironment.getDist()`, `Dist`, or `@Mod(..., dist = Dist.CLIENT)` for physical-side/client-class isolation.
+- Use the target FML physical-side API (`FMLEnvironment.dist` on 1.21.1; newer versions may expose `getDist()`) and gated client classes. Neither a logical-side branch nor an ungated common static reference is safe isolation.
 - Never assume singleplayer means server-only code can touch client classes; singleplayer has both a logical client and logical server inside a physical client.
 - Transfer state between logical sides with networking payloads, not static fields.
 - Run `runServer` or a dedicated-server test path to catch `NoClassDefFoundError` from client-only imports.
@@ -79,9 +77,10 @@ public ExampleMod(IEventBus modBus) {
 
 - Register custom payloads during `RegisterPayloadHandlersEvent` on the mod event bus using `event.registrar("<protocol-version>")`.
 - Implement payloads as `CustomPacketPayload` records/classes with a unique `Type` and a `StreamCodec`.
-- Choose `playToServer`, `playToClient`, or `playBidirectional` according to direction; register clientbound handlers with `RegisterClientPayloadHandlersEvent` in client-only code.
-- Keep handlers on the main thread by default; use `HandlerThread.NETWORK` only for expensive work, then return to the game thread with `IPayloadContext#enqueueWork` and handle exceptions.
-- Send client-to-server payloads with `ClientPacketDistributor.sendToServer`; send server-to-client payloads with `PacketDistributor` helpers.
+- Choose `playToServer`, `playToClient`, or `playBidirectional` according to direction. On 1.21.1 handlers are supplied to the registrar (bidirectional handlers can use `DirectionalPayloadHandler`); current 26.1 uses `RegisterClientPayloadHandlersEvent` for client handlers. Keep their implementation physically client-only in either case.
+- Keep gameplay handlers on the main thread by default. `HandlerThread.NETWORK` changes execution context; it is not an unbounded worker pool. Bound parsing/work, never block network I/O with expensive computation, and use `IPayloadContext#enqueueWork` for game state with exception handling.
+- Validate serverbound permissions, distances, counts, identifiers, and loaded-chunk/entity existence; do not load arbitrary chunks on client request.
+- On 1.21.1 use `PacketDistributor.sendToServer`; on current 26.1 use `ClientPacketDistributor.sendToServer` in client-only code. Server-to-client sends use `PacketDistributor` helpers.
 - Respect payload size limits: clientbound payloads are at most 1 MiB, serverbound payloads are less than 32 KiB.
 
 ## Resources And Datagen
@@ -90,7 +89,7 @@ public ExampleMod(IEventBus modBus) {
 - Remember NeoForge generates built-in resource/data packs for mods and modern NeoForge handles `pack.mcmeta` at runtime.
 - Use vanilla and NeoForge external resources in the IDE as the source of truth for JSON formats.
 - Prefer datagen for repetitive or fragile JSON: models, blockstates, lang, tags, recipes, loot tables, sounds, particles, data maps, and datapack registries.
-- Register datagen providers from `GatherDataEvent.Client`; use event helpers such as `createProvider`, `createBlockAndItemTags`, and `createDatapackRegistryObjects` when available.
+- On 1.21.1 register providers from `GatherDataEvent` with the appropriate include flags. Later versions split gathering into `GatherDataEvent.Client`/`Server`; inspect the exact target provider helpers and configured runs rather than backporting current examples.
 - Use `RegistrySetBuilder` and `BootstrapContext` for datapack registry entries that need generated JSON.
 
 ## Validation Checklist

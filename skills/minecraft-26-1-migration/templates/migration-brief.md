@@ -13,6 +13,9 @@ Complete this before implementation. Use `Unknown — user decision required` in
 - Current Java / Gradle / build plugins:
 - Current mappings namespace:
 - Modules/source sets:
+- Canonical/VCS source state and restoration command:
+- Per-version overrides and generated/processed source roots:
+- Maintained old nodes and target-only plugin/toolchain changes:
 - Publication coordinates/artifacts:
 
 ## 2. Product and compatibility contract
@@ -107,7 +110,7 @@ Categories: HUD/GUI, entity, block entity, level/world, baked/model loading, flu
 
 Record exact discovered task names and real expected outcomes.
 
-| Gate | Loader/environment | Command or procedure | Required outcome |
+| Gate | Loader/environment | Command or procedure | Required outcome / observed result / gaps |
 |---|---|---|---|
 | Clean build | | | |
 | Unit/static tests | | | |

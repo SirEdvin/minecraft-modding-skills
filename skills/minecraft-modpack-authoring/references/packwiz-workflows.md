@@ -170,9 +170,9 @@ The CLI currently exposes Minecraft and loader migrations. Migrations update Pac
 ## Export
 
 ```bash
-mkdir -p build
-packwiz modrinth export -o build/my-pack.mrpack
-packwiz curseforge export -o build/my-pack.zip
+mkdir -p ../pack-exports
+packwiz modrinth export -o ../pack-exports/my-pack.mrpack
+packwiz curseforge export -o ../pack-exports/my-pack.zip
 ```
 
 Current source performs a refresh before export. Modrinth export normally restricts external-file domains according to platform rules. CurseForge export supports side selection; inspect `packwiz curseforge export --help` and verify that client and server artifacts contain the expected overrides.
@@ -236,3 +236,5 @@ Do not use `packwiz serve` as the only CI validation and do not invoke bulk upda
 - **Server receives client mods:** correct metadata only after dedicated-server testing confirms the project is client-only.
 - **Update jumps Minecraft lines:** inspect `pack.toml`, acceptable versions, loader aliases, and the selected project version metadata.
 - **Installer repeats downloads:** confirm hosted `pack.toml`/index hashes are current, stable HTTP caching is not serving mismatched files, and the installer state can be written.
+
+Export outside the pack root, or explicitly exclude the entire output directory in `.packwizignore`. See [reproducibility audit](reproducibility-audit.md).

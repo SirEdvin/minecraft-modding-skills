@@ -6,12 +6,7 @@ compatibility: Stonecutter 0.9.8 on Gradle 9.0+; plugin, loader, game, and Java 
 metadata:
   version: "0.1.0"
   author: Hermes
-  hermes:
-    tags:
-      - Stonecutter
-      - Gradle
-      - Minecraft
-      - Modding
+  hermes-tags: "Stonecutter, Gradle, Minecraft, Modding"
 ---
 
 # Stonecutter Multi-Version Modding
@@ -47,7 +42,7 @@ From the repository root, inspect `settings.gradle(.kts)`, `stonecutter.gradle(.
 ./gradlew build
 ```
 
-Never guess generated task names or project paths. Read them from `projects` and `tasks --all`, especially when a project separates logical versions from node names.
+Never guess generated task names or project paths. Read them from `projects` and `tasks --all`, especially when a project separates logical versions from node names. For multiple library trees, first read [project topology and task discovery](references/project-topology.md); a Gradle repository root is not necessarily a Stonecutter controller.
 
 Load detailed topics on demand with `skill_view(name="stonecutter-multiversion", file_path="references/<file>")`:
 - `references/properties-and-data-setup.md`: load for property resolution, typed/raw access, JSON schemas, CI matrices, inheritance, or 0.10 accessor migration.
@@ -58,8 +53,6 @@ These references distinguish release evidence from forward-looking wiki APIs and
 ## Quick Reference
 
 ```text
-./gradlew projects
-./gradlew tasks --all
 ./gradlew "Set active project to <project>"
 ./gradlew "Refresh active project"
 ./gradlew "Reset active project"
@@ -69,16 +62,7 @@ These references distinguish release evidence from forward-looking wiki APIs and
 ./gradlew build
 ```
 
-```text
-settings.gradle.kts                 tree/branch/node registration
-stonecutter.gradle.kts              controller, active node, parameters
-build.gradle.kts                    shared per-node build template
-build.<loader>.gradle.kts           split loader build template
-stonecutter.properties.toml         structured shared/version properties
-versions/<project>/                 node project
-versions/<project>/build/generated/stonecutter/ generated inactive sources
-src/                                shared source in active-node state
-```
+Settings register trees/branches/nodes; `stonecutter.gradle.kts` is the controller, `build.gradle.kts` or `build.<loader>.gradle.kts` is the node template, `stonecutter.properties.*` supplies structured values, and `src/` reflects the active node. Node directories are `versions/<project>/`; inactive sources under their `build/generated/stonecutter/` are disposable.
 
 ## Procedure
 
@@ -147,27 +131,7 @@ src/                                shared source in active-node state
    }
    ```
 
-5. **Express the smallest source delta.**
-
-   ```java
-   //? if >=1.21 {
-   newApi();
-   //?} else
-   /*oldApi();*/
-
-   //? if fabric && minecraft: >=1.21
-   fabricOnly();
-   ```
-
-   - Closed scope: `//? if condition {` through `//?}`.
-   - Line scope: condition affects the next non-empty line/logical block.
-   - Lookup scope: `//? if condition >> 'token'`; add `+` after `>>` to capture the token.
-   - Branch with `else`, `elif`, or `else if`; every branch before the last must be closed.
-   - Predicates: `=`, `!=`, `<`, `>`, `<=`, `>=`, `~` (same major/minor), `^` (same major), plus `!`, `&&`, `||`, and parentheses.
-   - Define loader/build booleans with `constants`, library versions with `dependencies`, repeated code alternatives with registered `swaps`, and broad reversible renames with `replacements.string`.
-   - Prefer string replacements. Regex replacements are slower and require explicit forward and reverse patterns. Avoid ambiguous or cyclic replacement graphs.
-   - Local swaps (`//$ if ...`) and scoped local replacements (`//~ if ... 'old' -> 'new'`) are released in 0.9.x. Prefer registered swaps for repeated logic and review every transformed node.
-   - Do not copy 0.10 `targets`, named local replacements (`as name` / `as _`), or `getAs` property examples into 0.9.x. Keep `dependencies` and the matching property API until a deliberate migration.
+5. **Express the smallest source delta.** Read [source syntax and layouts](references/source-and-layout.md) for conditions, swaps, replacements, resource handlers, and multi-loader layout choices. Keep released 0.9.x APIs; do not import 0.10 syntax implicitly.
 
 6. **Use the daily switching ritual.** Invoke through `terminal`:
 
@@ -193,21 +157,7 @@ src/                                shared source in active-node state
    - Run root `./gradlew build` to build all nodes from shared/generated sources.
    - For removals, use `search_files` to clear stale project names, logical versions, constants, properties, publication selectors, and CI matrix entries; then remove the obsolete `versions/<project>/` directory and inspect the complete diff.
 
-8. **Choose a maintainable multi-loader layout.**
-   - Flat nodes combine version and loader in one tree and use split build scripts/constants. They suit small or Mixin-heavy mods.
-   - Branched `common`/`fabric`/`neoforge` sources isolate loader APIs and cache well, but require more Gradle wiring.
-   - Official guidance prefers split native loader build scripts for long-term flat multi-loader maintenance. Do not force one build plugin to emulate every loader when native plugins are clearer.
-   - Keep logical Minecraft version separate from project names such as `1.21.1-fabric`; otherwise the loader suffix is parsed as a SemVer prerelease.
-
-9. **Handle resources and uncommon formats intentionally.**
-   - 0.9.7 source defaults cover Java/Scala/Groovy/Gradle/JSON5, Kotlin, shaders, YAML, CFG, access wideners/transformers, and class tweakers—but not `.properties`, despite the FAQ claim.
-   - For `.properties`, explicitly register `stonecutter handlers { inherit("aw", "properties") }` or another handler whose comment syntax matches the file.
-   - Reuse a handler with `stonecutter handlers { inherit("aw", "your_extension") }` before writing an ANTLR-backed custom handler.
-   - `stonecutter.filters` is exclusion-only; paths are relative to each `src/<source-set>` directory. Do not call `include`.
-   - Use `sc.process(input, output)` only for files a loader consumes before ordinary source/resource processing; it is expensive and not normally cached/parallelized.
-   - With Fabric Loom interface injection, set `loom.fabricModJsonPath` to the shared valid JSON file. Unprocessed placeholders must still leave valid JSON.
-
-10. **Build, release, upgrade, and commit cleanly.**
+8. **Build, release, upgrade, and commit cleanly.**
     - Root `./gradlew build` builds all registered nodes; node-qualified `build`, `runClient`, and `runServer` target one node.
     - `buildAndCollect` is an official-template convenience task, not a core Stonecutter task. Confirm it exists before invoking it.
     - Aggregate only a publishing task that the applied publishing plugin actually registers, using `stonecutter.tasks.named("actualTaskName")`; do not assume official templates provide publishing tasks or eagerly call `.get()`.
@@ -229,7 +179,7 @@ src/                                shared source in active-node state
 - Enable named replacements before code for file-wide effect; later `//~ id` / `//~ !id` directives intentionally set/reset processing for subsequent regions, not a boolean toggle.
 - `parameters {}` is lazily evaluated Stonecutter configuration, not a substitute for `subprojects {}` build customization.
 - Native `gradle.properties` still controls `org.gradle.*` launch settings; structured properties only supply build-script values.
-- Do not apply `base`/`java` to the tree's controller root; each Stonecutter node is the buildable project.
+- Do not apply `base`/`java` to a Stonecutter tree controller; its nodes are buildable projects. An ordinary monorepo root outside those trees may apply `java` or aggregate tasks. Do not remove it merely because Stonecutter is used elsewhere.
 - If `dev.kikugie.stonecutter.no_short_extension` is present in `gradle.properties`, use the full `stonecutter` extension; its mere presence disables the `sc` alias, even when set to `false`.
 - `generate_sources_on_sync=true` makes preprocessing errors fail IDE sync; the current wiki documents true as the default. Diagnose preprocessing before treating sync failure as broken IDE integration.
 - Do not set Gradle `group` blindly: official Fabric and multi-loader templates intentionally keep `mod.group` as metadata without assigning `project.group`.
