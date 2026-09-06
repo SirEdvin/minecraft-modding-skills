@@ -5,12 +5,7 @@ license: MIT
 metadata:
   version: "0.1.0"
   author: Hermes
-  hermes:
-    tags:
-      - Minecraft
-      - Modding
-      - UI
-      - Screens
+  hermes-tags: "Minecraft, Modding, UI, Screens"
 ---
 
 # Minecraft Native UI
@@ -38,6 +33,8 @@ Build Minecraft-native interfaces for blocks, items, tools, editors, diagnostics
 
 Use `search_files` and `read_file` to trace how the UI opens, owns state, handles input, renders, and saves. Apply changes with `patch`, then invoke the project’s existing Gradle build, client, game-test, and dedicated-server tasks through the `terminal` tool.
 
+Read [version scope and menu/network boundaries](references/version-and-boundaries.md) when choosing loader factories, migrating opening data, or designing client tests.
+
 ## Quick Reference
 
 - General client view: `Screen`
@@ -53,9 +50,9 @@ Use `search_files` and `read_file` to trace how the UI opens, owns state, handle
 - Menu opening: `ServerPlayer#openMenu`, `MenuProvider`
 - Initial menu context: `FriendlyByteBuf`, `RegistryFriendlyByteBuf`
 - NeoForge factory: `IMenuTypeExtension.create`
-- Fabric factory: `ExtendedMenuType`
-- 1.20/1.21 rendering: `GuiGraphics`
-- 26.1 rendering: `GuiGraphicsExtractor`, `extractRenderState`, `RenderPipelines`
+- Fabric factory: `ExtendedScreenHandlerType` (API name; mapped menu classes differ)
+- Mojmap 1.20.1/1.21.1 rendering: `GuiGraphics` (later 1.21 releases need separate inspection)
+- 26.1 migration leads: `GuiGraphicsExtractor`, `extractRenderState`, `RenderPipelines`; resolve exact target signatures before use.
 
 ## Procedure
 
@@ -119,7 +116,7 @@ Use `search_files` and `read_file` to trace how the UI opens, owns state, handle
     - Do not trust a client-side item snapshot or block position merely because the screen received it at open time.
 
 11. **Adapt rendering by version.**
-    - On 1.20/1.21, follow the exact branch’s `GuiGraphics`, `render`, and background methods.
+    - On 1.20.1/1.21.1, follow the exact branch’s `GuiGraphics`, `render`, and background methods. Do not generalize those signatures across all 1.21.x releases.
     - On 26.1, inspect current signatures. SFM and Sophisticated Core use `GuiGraphicsExtractor`, `extractRenderState`, and `RenderPipelines`; extraction submits render state instead of issuing older immediate calls.
     - Keep rendering side-effect free: mutation, packet sends, saves, and expensive parsing should not happen merely because a frame is extracted.
     - Verify mapping renames such as `ResourceLocation` versus `Identifier` in the target branch.
@@ -153,7 +150,9 @@ Use `search_files` and `read_file` to trace how the UI opens, owns state, handle
 
 Invoke the repository’s full build through the `terminal` tool, then open each changed UI from its real origin and prove resize, focus, input, save/cancel, and reopen behavior; for synchronized actions, confirm the dedicated server accepts valid requests, rejects invalid ones, and logs no client-class or protocol errors.
 
-## Sources Reviewed
+## Source Leads
+
+The branch list below is retained as discovery guidance, not immutable evidence for every current API. The linked version-boundary reference records this audit’s pinned project evidence. Re-resolve branches before implementing 26.1 code.
 
 - Super Factory Manager: `https://github.com/TeamDman/SuperFactoryManager` (`1.20.1`, `1.21.1`, `26.1.2` branches), including label gun, text editors, canvas, logs, examples, diagnostics, widgets, and manager menus.
 - CC:Tweaked: `https://github.com/cc-tweaked/CC-Tweaked` (`mc-1.20.x`, `mc-1.21.x`, `mc-26.1` branches).
