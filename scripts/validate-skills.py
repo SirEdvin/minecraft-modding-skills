@@ -31,6 +31,7 @@ BACKTICKED_LOCAL = re.compile(
     r"`((?:references|templates|scripts|assets)/[^`\s]+|"
     r"(?:(?:\.\.?/)?[^`/\s]+/)+[^`\s]+\.md)`"
 )
+FENCE_OPEN = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 URI_SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 CATALOG_ENTRY = re.compile(r"^- `([a-z0-9]+(?:-[a-z0-9]+)*)` — (.+)$")
 SUPPORT_DIRECTORIES = ("references", "templates", "scripts")
@@ -88,7 +89,7 @@ def parse_frontmatter(path, text, errors):
     end = match.start() + 4
     try:
         frontmatter = yaml.load(text[4:end], Loader=UniqueKeyLoader)
-    except yaml.YAMLError as exc:
+    except (yaml.YAMLError, ValueError) as exc:
         errors.append(f"{path}: invalid YAML: {exc}")
         return None
     if not isinstance(frontmatter, dict):
@@ -98,6 +99,23 @@ def parse_frontmatter(path, text, errors):
 
 
 def reference_targets(markdown_path, skill_root, text, errors):
+    visible = []
+    fence = None
+    for line in text.splitlines(keepends=True):
+        if fence:
+            if re.fullmatch(
+                rf" {{0,3}}{re.escape(fence[0])}{{{len(fence)},}}[ \t]*",
+                line.rstrip("\r\n"),
+            ):
+                fence = None
+            continue
+        match = FENCE_OPEN.match(line)
+        if match:
+            fence = match.group(1)
+            continue
+        visible.append(line)
+    text = "".join(visible)
+
     raw_targets = [match.group(1) for match in MARKDOWN_LINK.finditer(text)]
     raw_targets.extend(BACKTICKED_LOCAL.findall(text))
     targets = set()
@@ -208,8 +226,7 @@ def validate_skill(skill, errors):
     package = skill.resolve()
     while pending:
         for target in graph.get(pending.pop(), set()):
-            relative = target.relative_to(package)
-            if relative.parts and relative.parts[0] in SUPPORT_DIRECTORIES and target not in reachable:
+            if target not in reachable:
                 reachable.add(target)
                 pending.append(target)
     for directory in SUPPORT_DIRECTORIES:

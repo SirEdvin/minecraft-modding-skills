@@ -81,6 +81,14 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("duplicate YAML key 'version'" in error for error in errors), errors)
         self.assertFalse(any("Traceback" in error for error in errors), errors)
 
+    def test_invalid_yaml_timestamp_is_rejected_without_traceback(self):
+        for timestamp in ("2026-99-99", "2026-09-06T25:00:00Z"):
+            with self.subTest(timestamp=timestamp):
+                self.write_skill(metadata=f"version: 1.0.0\n  reviewed: {timestamp}")
+                errors = self.errors()
+                self.assertTrue(any("invalid YAML" in error for error in errors), errors)
+                self.assertFalse(any("Traceback" in error for error in errors), errors)
+
     def test_non_string_top_level_frontmatter_key_is_rejected_without_traceback(self):
         path = self.root / "skills" / "example-skill" / "SKILL.md"
         path.write_text(path.read_text().replace("license: MIT\n", "license: MIT\n1: invalid\n"))
@@ -117,12 +125,38 @@ class ValidatorTests(unittest.TestCase):
         )
         self.assertEqual([], self.errors())
 
+    def test_fenced_markdown_links_and_backticks_are_exempt(self):
+        skill = self.root / "skills" / "example-skill"
+        (skill / "templates").mkdir()
+        for fence in ("```", "~~~"):
+            with self.subTest(fence=fence):
+                (skill / "templates" / "README.md").write_text(
+                    f"{fence}markdown\n"
+                    "[Contributing](CONTRIBUTING.md)\n"
+                    "Use `references/missing.md`.\n"
+                    f"{fence}\n"
+                )
+                self.write_skill(body="Use `templates/README.md`.\n")
+                self.assertEqual([], self.errors())
+
     def test_standard_markdown_relative_link_and_multihop_support(self):
         skill = self.root / "skills" / "example-skill"
         (skill / "references").mkdir()
         (skill / "references" / "first.md").write_text("Continue to [second](second.md).\n")
         (skill / "references" / "second.md").write_text("Done.\n")
         self.write_skill(body="Read [the first reference](references/first.md).\n")
+        self.assertEqual([], self.errors())
+
+    def test_support_reachability_can_traverse_root_and_assets_markdown(self):
+        skill = self.root / "skills" / "example-skill"
+        (skill / "assets").mkdir()
+        (skill / "references").mkdir()
+        (skill / "index.md").write_text("Continue to [assets](assets/index.md).\n")
+        (skill / "assets" / "index.md").write_text(
+            "Continue to [guide](../references/guide.md).\n"
+        )
+        (skill / "references" / "guide.md").write_text("Done.\n")
+        self.write_skill(body="Read [the index](index.md).\n")
         self.assertEqual([], self.errors())
 
     def test_unreachable_support_file_is_rejected(self):
