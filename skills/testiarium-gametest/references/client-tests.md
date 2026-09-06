@@ -44,4 +44,3 @@ The same task suffix is configured on the pinned Forge-family nodes. The 180-sec
 - Capture logs and reports on failure, including timeout. Reports finalize only during orderly completion; a missing report after termination is an incomplete result. Check for surviving Minecraft/Xvfb child processes after forced cleanup rather than assuming a wrapper exit killed every descendant.
 
 Keep client hook registration physically client-only. On Forge 1.20 use `DistExecutor` or an equivalent safe boundary. On NeoForge 1.21 check `FMLEnvironment.dist == Dist.CLIENT` before touching client hooks. On Fabric use a `client` entrypoint. Never load client helper classes on a dedicated server.
-

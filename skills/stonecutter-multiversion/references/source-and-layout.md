@@ -37,4 +37,3 @@ Preserved 0.9.x guidance; consult the core skill and its version-boundary refere
    - `stonecutter.filters` is exclusion-only; paths are relative to each `src/<source-set>` directory. Do not call `include`.
    - Use `sc.process(input, output)` only for files a loader consumes before ordinary source/resource processing; it is expensive and not normally cached/parallelized.
    - With Fabric Loom interface injection, set `loom.fabricModJsonPath` to the shared valid JSON file. Unprocessed placeholders must still leave valid JSON.
-

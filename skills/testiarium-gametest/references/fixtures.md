@@ -24,4 +24,3 @@ The testmod fills omitted SNBT positions with explicit air. The mixin target is 
 - Minecraft 1.21.1 targets `StructureTemplateManager` with `StructureTemplateManagerMixin` and enables test-structure loading outside an IDE.
 
 Include the matching mixin and `StructureTemplateAccessor` when relying on compact structures; this behavior is not part of the core production artifact. On Fabric consumers whose run only loads their own testmod, reference a local mixin config containing the appropriate Testiarium mixins.
-
