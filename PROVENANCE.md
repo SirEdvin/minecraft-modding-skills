@@ -4,7 +4,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 
 ## Official Documentation Used
 
-`minecraft-fabric-modding`:
+`fabric-modding`:
 
 - https://docs.fabricmc.net/develop/
 - https://docs.fabricmc.net/develop/loader/
@@ -13,7 +13,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://docs.fabricmc.net/develop/data-generation/setup
 - https://github.com/FabricMC/fabric-docs/tree/main/reference/latest
 
-`minecraft-neoforge-modding`:
+`neoforge-modding`:
 
 - https://docs.neoforged.net/docs/gettingstarted/
 - https://docs.neoforged.net/docs/1.21.1/gettingstarted/
@@ -25,7 +25,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://docs.neoforged.net/docs/resources/
 - https://github.com/neoforged/ModDevGradle
 
-`minecraft-legacy-forge-modding`:
+`neoforge-legacy-modding`:
 
 - https://docs.minecraftforge.net/en/1.20.x/
 - https://docs.minecraftforge.net/en/1.20.x/concepts/registries/
