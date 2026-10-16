@@ -122,6 +122,8 @@ The migration skill was independently authored from official documentation and r
 
 The Stonecutter skill was independently distilled from official documentation, current plugin source, and official template behavior. Documented task names and version-switch/reset semantics were smoke-tested with Stonecutter 0.9.7 and Gradle 9.6.1 in a disposable copy of the official Fabric template; no upstream prose or source was copied.
 
+The 0.2.0 skill update checks Stonecutter 0.9.8 stable and 0.10-beta.1 prerelease against both Maven repositories on 2026-10-16. Release notes were read from `stonecutter/docs` commit `2f685fdf78a83c5453e007177b5e4dc4f14b29e6`, files `changelogs/stonecutter-0.9.md` and `changelogs/stonecutter-0.10.md`; stable source was inspected at `stonecutter/stonecutter` commit `73632f3266a1e81683dedb4a52168ec53c583442` and compared with published source JARs. Stable upgrade/build/switch checks were executed in Minecraft-Modding-Libs and TemplateProject. The 0.10 beta was researched, not adopted or runtime-verified. See the skill's release-and-migration-contracts reference for complete endpoints and limitations.
+
 `modrinth-api`:
 
 - https://docs.modrinth.com/api/

@@ -2,9 +2,9 @@
 name: stonecutter-multiversion
 description: Maintain multi-version mods with Stonecutter.
 license: MIT
-compatibility: Stonecutter 0.9.7 on Gradle 9.0+; plugin, loader, game, and Java versions are version-sensitive.
+compatibility: Stonecutter 0.9.8 stable on Gradle 9.0+; 0.10-beta.1 is a separate prerelease requiring Java 25 and Gradle 9.7+. Verify current release metadata before upgrading.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: Hermes
   hermes:
     tags:
@@ -29,10 +29,10 @@ Use Stonecutter to set up, develop, test, and maintain Minecraft mods across com
 
 ## Prerequisites
 
-- A Gradle project with `gradlew`; Stonecutter 0.9.7 requires Gradle 9.0 or newer.
+- A Gradle project with `gradlew`; Stonecutter 0.9.8 requires Gradle 9.0 or newer.
 - A JDK/toolchain for every target Minecraft version; loader plugins may provision toolchains, but verify them before building.
 - No environment variables or credentials are required for local switching/building. Publishing credentials belong to the selected publishing plugin, not Stonecutter.
-- Before a new setup or plugin upgrade, use `web_extract` on `https://stonecutter.kikugie.dev/wiki/start/settings` and `https://stonecutter.kikugie.dev/blog/changes/0.9`, then confirm the current release at `https://plugins.gradle.org/plugin/dev.kikugie.stonecutter`.
+- Before a new setup or plugin upgrade, confirm the release at `https://plugins.gradle.org/plugin/dev.kikugie.stonecutter` and the release/snapshot Maven metadata. Read the pinned upstream changelog and source; the website now uses `/wiki/v2/` and may return bot-blocking garbage rather than documentation. See [release and migration contracts](references/release-and-migration-contracts.md) for authoritative fallbacks and the stable/prerelease distinction.
 - Prefer an official template when migrating an existing mod: Fabric `https://codeberg.org/stonecutter/template-fabric`, NeoForge `https://codeberg.org/stonecutter/template-neoforge`, or multi-loader `https://codeberg.org/stonecutter/template-multiloader`.
 - The optional IntelliJ plugin is `https://plugins.jetbrains.com/plugin/25044-stonecutter-dev`.
 
@@ -80,11 +80,11 @@ src/                                shared source in active-node state
    - Record each tree, branch, node project name, logical version, build script, loader, active node, VCS node, property source, Java level, build/test/run tasks, and publication task.
    - Choose Stonecutter for compatible deltas. Prefer separate branches/projects when target implementations are mostly unrelated.
 
-2. **Create or align the settings model.** At the reviewed 0.9.7 release, Kotlin DSL setup is:
+2. **Create or align the settings model.** At the reviewed 0.9.8 stable release, Kotlin DSL setup is:
 
    ```kotlin
    plugins {
-       id("dev.kikugie.stonecutter") version "0.9.7"
+       id("dev.kikugie.stonecutter") version "0.9.8"
    }
 
    stonecutter {
@@ -203,7 +203,7 @@ src/                                shared source in active-node state
     - Root `./gradlew build` builds all registered nodes; node-qualified `build`, `runClient`, and `runServer` target one node.
     - `buildAndCollect` is an official-template convenience task, not a core Stonecutter task. Confirm it exists before invoking it.
     - Aggregate only a publishing task that the applied publishing plugin actually registers, using `stonecutter.tasks.named("actualTaskName")`; do not assume official templates provide publishing tasks or eagerly call `.get()`.
-    - Before upgrading Stonecutter, read every changelog entry from the installed version to the target, update the Gradle wrapper if required, sync, list projects/tasks, perform a switch/reset round trip, then build all nodes.
+    - Before upgrading Stonecutter, distinguish the latest stable release from the snapshot repository's latest prerelease. Read every changelog entry through the selected target, including reversions in later entries. Update toolchains only when required, sync, list projects/tasks, perform a switch/reset round trip, then build all nodes.
     - Before commit, invoke `./gradlew "Reset active project"`, inspect `git diff`, and confirm changes are intentional source/config edits rather than active-version noise.
 
 ## Pitfalls
@@ -211,9 +211,9 @@ src/                                shared source in active-node state
 - Stonecutter 0.9.7 generates tasks named `Set active project to ...`, `Refresh active project`, and `Reset active project`; some prose/docs still say “version.” Trust `tasks --all`.
 - Switching rewrites the active literal and shared source state. It does not discard legitimate edits or guarantee a clean tree if the previous state was stale.
 - Shared `src/` reflects the active node, but explicitly qualified inactive-node run/test tasks can execute generated sources when the loader exposes them. Generated-file edits are still disposable.
-- A file under `versions/<project>/src/` overrides the corresponding shared/generated file for that node; review overrides before assuming a shared edit reaches every node.
+- A file under `versions/<project>/src/` overrides the corresponding generated inactive file. In 0.9.7/0.9.8, active shared source sets can still contain both copies: enforce precedence for Java, Kotlin, resources, `allJava`, and `allSource`, and build in both active states before claiming the overlay works.
 - A green active-node build does not prove all nodes compile; run the root build.
-- At the reviewed commits, all three official templates still pin Stonecutter 0.9.6. Compare a template's pin with the current release before adopting or upgrading it.
+- Do not treat an official template's pin as the latest release; compare it with current plugin and Maven metadata.
 - Parallel NeoForge node builds may need the official multi-loader template's `createMinecraftArtifactsMutex` build service with `maxParallelUsages.set(1)` to serialize Minecraft artifact generation.
 - Generated source tasks are in `stonecutter-impl` and say “Do not call manually.” Use normal build/test tasks unless integrating a loader lifecycle dependency such as NeoForge `createMinecraftArtifacts` depending on `stonecutterGenerate`.
 - String replacements reject ambiguous/cyclic mappings; regex replacements lack those safety guarantees.
@@ -228,8 +228,8 @@ src/                                shared source in active-node state
 
 ## Verification
 
-Invoke the repository-wide build through the `terminal` tool; success proves every registered node can generate and consume its versioned sources:
+Run Gradle with `--no-daemon`, an explicit timeout for game processes, and redirected output; inspect bounded diagnostics from the log instead of streaming verbose Java/Gradle output. A root build checks registered nodes, but does not prove gameplay, publication contracts, or GameTest discovery. Require fresh, nonempty reports with no failures/errors, and repeat builds with both active states before restoring the VCS node.
 
 ```bash
-./gradlew build
+./gradlew build --no-daemon > "$TMPDIR/stonecutter-build.log" 2>&1
 ```
