@@ -71,7 +71,7 @@ projects/alpha/fabric/versions/1.20.1/    node :alpha:fabric:1.20.1
 ```
 
 - Node paths are `:alpha:1.20.1` for the root branch and `:alpha:fabric:1.20.1` for a branch (0.9.8 and 0.10 `[probe]`).
-- A branch without its own version list takes the tree's versions `[probe]`. Give a branch an explicit list when a loader does not exist for every version.
+- A branch without its own version list takes the tree's versions `[probe]`. On 0.9.x the copy happens when `branch(...)` is called, so declare `versions(...)` first or the branch stays empty; 0.10 copies lazily `[source]`. Give a branch an explicit list when a loader does not exist for every version.
 - Each tree has its own active literal and its own switch tasks. The unqualified task switches every tree; `:alpha:Set active project to ...` switches one and leaves the others where they were `[probe]`.
 - Controller parameters see the branch through `node.branch.id`, node scripts through `sc.branch.id` (empty for the root branch) `[probe]`; derive loader constants from it instead of parsing project names.
 - Loader branches depend on the same-version node of the common branch, for example `project(":alpha:${sc.current.project}")` `[probe]`. If a branch packages the common node's sources or resources directly, also wire those tasks to the common node's `stonecutterGenerate`, or inactive nodes package stale files.

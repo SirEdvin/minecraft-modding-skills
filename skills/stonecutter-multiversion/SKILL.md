@@ -92,7 +92,7 @@ Settings register trees/branches/nodes; `stonecutter.gradle.kts` is the controll
    - Record each tree, branch, node project name, logical version, build script, loader, active node, VCS node, property source, Java level, build/test/run tasks, and publication task.
    - Choose Stonecutter for compatible deltas. Prefer separate branches/projects when target implementations are mostly unrelated.
 
-2. **Create or align the settings model.** Use the pin the project already has; for a new project take the current stable release from the Plugin Portal.
+2. **Create or align the settings model.** Use the pin the project already has. For a new project take the newest stable release from the Plugin Portal whose Gradle and launcher-JVM requirements every contributor machine and CI job can meet.
 
    ```kotlin
    plugins {
@@ -111,7 +111,7 @@ Settings register trees/branches/nodes; `stonecutter.gradle.kts` is the controll
    - `versions(...)` uses each project name as its logical version; `version(project, version)` separates node identity from the compared version.
    - `active` and `vcsVersion` always take project names, not logical versions.
    - Pick the layout deliberately: see [project topology](references/project-topology.md) for flat `{version}-{loader}` nodes versus `create("a", "b") { branch("fabric") }` trees.
-   - For Groovy scripts set `kotlinController = false` and `centralScript = "build.gradle"`; never point `centralScript` at the controller file.
+   - For Groovy scripts set `kotlinController = false` and `centralScript = "build.gradle"`. `centralScript` names the node build template, so never point it at the controller file.
    - Set `vcsVersion` deliberately. It is the canonical pre-commit source state.
 
 3. **Configure the controller.** Assign the active node exactly once in `stonecutter.gradle.kts`:
@@ -129,7 +129,7 @@ Settings register trees/branches/nodes; `stonecutter.gradle.kts` is the controll
    ```
 
    - A literal active value is rewritten during switching. `stonecutter active file("active.txt")` keeps the state in a file that must already name a registered project. `stonecutter active null` is detached mode for CI: `src/` is not linked and every node uses generated sources.
-   - Configure flags before the `active` statement.
+   - Set flags before the `active` statement; they are read when the active node is assigned `[wiki]`.
    - Keep only Stonecutter configuration in `parameters {}`; dependencies and tasks belong to node build scripts.
 
 4. **Parameterize node builds instead of cloning build scripts.**
@@ -158,7 +158,7 @@ Settings register trees/branches/nodes; `stonecutter.gradle.kts` is the controll
 8. **Build, release, upgrade, and commit cleanly.**
    - Root `./gradlew build` builds all registered nodes; node-qualified tasks target one node.
    - `buildAndCollect` is an official-template convenience task, not a core task. Confirm it exists.
-   - Aggregate only tasks the applied plugins actually register; never call `.get()` on the aggregated collection.
+   - Aggregate only tasks the applied plugins actually register. Never call `.get()` on the aggregated collection: it is lazy so that node projects are not forced to configure early.
    - Before changing the pin read [upgrading to 0.10](references/upgrade-to-0.10.md) and [release contracts](references/release-and-migration-contracts.md). Upgrade the Gradle wrapper and launcher JVM first, as a separately verified step.
    - Before commit run `"Reset active project"`, inspect `git diff`, and confirm changes are intentional rather than active-version noise.
 

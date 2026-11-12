@@ -10,9 +10,9 @@
 | Gradle 9.7.0 or newer | The plugin checks it and fails with `Stonecutter requires at least Gradle 9.7.0` `[probe]` |
 | Kotlin 2.4 | Supplied by Gradle: the 9.7.0 distribution ships Kotlin 2.4.0, 9.5.0 ships 2.3.20 `[probe]`. Build scripts need no Kotlin change. Only code that uses Stonecutter as a library must compile with Kotlin 2.4 `[changelog]` |
 | Kotlin DSL | Default. Groovy scripts need `kotlinController = false` plus `centralScript`, or the `hard_mode` flag `[wiki]` |
-| Node toolchains | Unchanged. Java 17 and Java 21 toolchain nodes of a four-node Fabric/Forge/NeoForge build compiled to their own class-file levels under a Java 25 launcher `[probe]` |
+| Node toolchains | Unchanged: keep each node's own toolchain. Fabric, Forge, and NeoForge nodes targeting Java 17 and 21 compile to their own class-file level under a Java 25 launcher `[probe]` |
 
-Gradle 9.7.0 and 9.9.1 both ran 0.10 `[probe]`. 0.9.8 also runs on Gradle 9.9.1 with a Java 25 launcher `[probe]`, so the wrapper and JDK can move first.
+Pick any Gradle from 9.7.0; 9.7.0 and 9.9.1 are confirmed with 0.10 `[probe]`. Move the wrapper and launcher JDK before the plugin: 0.9.8 runs on Gradle 9.9.1 with a Java 25 launcher `[probe]`.
 
 The launcher requirement applies to every environment that configures the build: contributors' machines, IDE Gradle JVM, and each CI job. In CI install toolchain JDKs first and the launcher JDK last, or set `JAVA_HOME` explicitly, and check the Gradle startup line rather than assuming.
 
@@ -39,22 +39,21 @@ The launcher requirement applies to every environment that configures the build:
 | File filter no longer matches | Patterns are relative to each source directory: drop the leading `java/` or `resources/`; move from `filters` to `files` `[changelog]` |
 | A task depends on `stonecutterPrepare` | That task no longer exists `[probe]`; depend on `stonecutterGenerate` |
 | `sc` alias unexpectedly present or absent | `no_short_extension` (presence disables) became `short_extension=false` `[changelog]` |
-| Flag code referencing `APPLY_PLUGIN_TO_NODES` | Renamed `AUTO_APPLY_PLUGIN` `[changelog]` |
+| Script code referencing `StonecutterFlag.APPLY_PLUGIN_TO_NODES` | The constant is `AUTO_APPLY_PLUGIN`; the `auto_apply_plugin` property is unchanged `[source]` |
 | Non-UTF-8 source or resource fails processing | Convert to UTF-8 `[changelog]` |
 | Preprocessing error inside code that is commented out for every node | Disabled scopes are now checked. Fix or delete the dead branch `[changelog]` |
 | Addon, custom file handler, or tool reading `build/stonecutter-cache` breaks | Handler API and model schema changed (schema 2, separate `stonecutter-model` artifact) `[changelog]`. Port or upgrade it |
 
 ## Deprecated but still working
 
-These compile on 0.10 with a warning `[probe]` unless marked; migrate them in a follow-up, not as part of the bump.
+These still work on 0.10; migrate them in a follow-up, not as part of the bump, so the bump stays reviewable.
 
-- `dependencies` → `targets`.
-- `stonecutter.tasks.named(...)` → `tasks.names(...)`.
-- `plugins { id("dev.kikugie.stonecutter") }` in the controller → remove (no-op).
-- `filters` → `files` `[source]`; mind the changed base directory.
-- Controller `stonecutter.current` → `stonecutter.active` `[changelog]`.
-- `replacements.string(id, direction)` → direction first `[source]`.
-- `project.property("structured.key")` keeps working through `expose_properties`; move to `sc.properties` before turning that flag off.
+- `dependencies` → `targets` (deprecation warning `[probe]`).
+- `stonecutter.tasks.named(...)` → `tasks.names(...)` (deprecation warning `[probe]`).
+- `filters` → `files` (deprecated `[source]`); mind the changed base directory.
+- Controller `stonecutter.current` → `stonecutter.active` (deprecated `[changelog]`).
+- `plugins { id("dev.kikugie.stonecutter") }` in the controller is a no-op without a warning `[probe]`; remove it.
+- `project.property("structured.key")` keeps working without a warning through `expose_properties` `[probe]`; move to `sc.properties` before turning that flag off.
 
 ## Contracts that did not change
 

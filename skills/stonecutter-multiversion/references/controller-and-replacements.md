@@ -8,7 +8,6 @@
 - 0.9.x requires `plugins { id("dev.kikugie.stonecutter") }` in the controller `[probe]`; 0.10 applies the plugin itself and treats the block as a no-op `[probe]`.
 - The predicate-version container is `dependencies` on 0.9.x and `targets` on 0.10; the old name still works on 0.10 with a deprecation warning `[probe]`.
 - Read the active node in the controller with `stonecutter.current` on 0.9.x and `stonecutter.active` on 0.10 `[changelog]`.
-- Inside `parameters {}` prefer `project.property(...)` or `properties[...]` over `node.project.property(...)`.
 
 ## Lazy task aggregation
 
@@ -34,7 +33,7 @@ tasks.register("publishAll") {
 - Default ordering parses each node's logical version, not its project name. Add a comparator for loader order: `versionComparator.thenComparingInt { if (it.metadata.project.endsWith("fabric")) 1 else 0 }`.
 - Order concrete publishing tasks, not an umbrella task that only delegates.
 - Missing tasks are skipped from 0.9.3; older versions fail `[changelog]`.
-- 0.10 exposes the underlying lock as `StonecutterTaskMutexService.create(gradle, "name")` for `usesService(...)` in any build script. It prevents parallel runs without promising an order `[wiki]`.
+- The underlying lock is available as `StonecutterTaskMutexService.create(gradle, "name")` for `usesService(...)` in any build script on both lines `[source]`, although the wiki documents it from 0.10. It prevents parallel runs without promising an order.
 - Do not serialize an entire build because one artifact-generation task is concurrency-sensitive.
 
 ## Lifecycle wiring
@@ -54,12 +53,12 @@ tasks.named("createMinecraftArtifacts") {
 
 ## Flags
 
-Properties have the prefix `dev.kikugie.stonecutter.` and live in the `gradle.properties` beside the controller. Names and defaults below are the 0.10 documentation `[wiki]`.
+Properties have the prefix `dev.kikugie.stonecutter.`. Controller-scoped flags are read from the `gradle.properties` beside the controller; `hard_mode` is read by the settings plugin, so set it in the root `gradle.properties` `[source]`. Suffixes and defaults below match the 0.10 source `[source]`.
 
 | Suffix | Purpose | Default |
 | --- | --- | --- |
 | `hard_mode` | Opt into Groovy scripts and silence the limitation notice | false |
-| `auto_apply_plugin` | Apply the plugin to nodes (0.9.x name: `APPLY_PLUGIN_TO_NODES`) | true |
+| `auto_apply_plugin` | Apply the plugin automatically: to nodes on 0.9.x, to nodes and the controller on 0.10. Same property on both lines; only the Kotlin constant changed from `APPLY_PLUGIN_TO_NODES` to `AUTO_APPLY_PLUGIN` | true |
 | `generate_sources_on_sync` | Generate sources during IDE Gradle sync | true |
 | `generate_switch_actions` | Create IDE switch run configurations | true |
 | `serialize_tree_model` | Write model cache for IDE/addon tooling | true |
@@ -100,7 +99,7 @@ stonecutter {
 - `//~ me_imports` enables subsequent processing; `//~ !me_imports` disables it. This is set/reset, not a toggle.
 - Several IDs fit in one directive: `//~ enable_me !disable_me`.
 - Put the enabling directive before code when the whole file needs it; later directives affect only what follows.
-- Pass direction first, then the identifier; the identifier-first overload is deprecated on 0.10 `[source]`.
+- Pass direction first, then the identifier; the identifier-first overload is deprecated on both lines `[source]`.
 
 ## Local replacement scope
 
@@ -114,7 +113,7 @@ stonecutter {
 
 1. The earlier starting match wins.
 2. At an equal start the longer match wins.
-3. For an identical range do not rely on a winner; the documented tie-break changed between versions.
+3. For an identical range, which only regex patterns can produce, the last registered replacement applies `[wiki]`. Do not build on that order; make the patterns disjoint.
 
 - Output preservation means `MyClass` to `MyClassRewrite` does not become `MyClassRewriteRewrite` on refresh.
 - Replacements can span ordinary text and comments, but a Stonecutter directive comment interrupts matching. A lookup that fails near a directive may reflect that boundary rather than a missing literal.

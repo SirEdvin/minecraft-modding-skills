@@ -23,7 +23,7 @@ Run `./gradlew projects` and save the node list; it is the baseline for the fina
 
 Both statements must name a registered node or configuration fails for every task, including the switch tasks that would fix it (0.9.8 and 0.10 `[probe]`):
 
-- a removed node still named by `vcsVersion` → `VCS version '<x>' doesn't match any registered subproject`;
+- a removed node still named by `vcsVersion` → `VCS version '<x>' doesn't match any registered subproject` on 0.9.8, `VCS project '<x>' doesn't match any registered subproject for project '<path>'` on 0.10;
 - a removed node still named by the active literal → `Version '<x>' is not registered`.
 
 So, while the node is still registered:

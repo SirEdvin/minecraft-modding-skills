@@ -24,7 +24,7 @@ Property lookup rules changed between 0.9.x and 0.10. A build that configures su
 - `sc.properties.get<String>(...)` does not compile on 0.10 because `get` is no longer generic. Replace it with `sc.properties["..."]` for strings and `getAs<T>` for other types.
 - A plugin applied in a node's `plugins {}` block reads project properties before the script body runs. One that takes its configuration from a structured property can fail on 0.10 until it is upgraded to a release that reads Stonecutter's API `[probe]`. Upgrade companion plugins together with Stonecutter.
 - Exposure as project properties slows configuration and can be turned off with `expose_properties=false`; do that only after every `property("...")` read of a structured key is migrated `[wiki]`.
-- Missing optional properties and conversion failures are different: nullable access must not hide a malformed value.
+- Use the nullable accessors only for keys that are genuinely optional. On 0.10 `getAsOrNull` also returns `null` for a value that fails conversion, so a required or typed key read through it turns a typo into a silent default; read those with `getAs` and let the build fail.
 - Composite objects are not primitive keys for `contains`. `raw()` / `rawOrNull()` return structured elements; convert in Kotlin with `.to<List<String>>()`, and inspect the element in Groovy instead of copying reified calls.
 
 ## Tags
@@ -63,7 +63,7 @@ Property lookup rules changed between 0.9.x and 0.10. A build that configures su
 
 ## Branch inheritance
 
-- A branch registered without a configuration block copies the root branch's versions on both lines `[wiki]`.
+- A branch registered without a configuration block copies the root branch's versions on both lines `[wiki]`; on 0.9.x only versions already declared at that point `[source]`.
 - 0.10 `inherit("common")`, `inherit("*")`, or a list copies from other branches. It is lazy and non-transitive: only versions a branch owns are copied, and locally declared nodes win `[changelog]`.
 - On 0.9.x inheritance reaches the root branch only. Declare explicit version lists for anything else.
 

@@ -62,12 +62,12 @@ Do not add these to a 0.9.x project: the older parser rejects or misreads them, 
 | No comments (replacements only) | — | `json`, `mcmeta`, `txt`, `md`, `csv` |
 
 - On 0.9.x `.properties` is not handled even though the FAQ lists it: `#?` conditions in it are copied verbatim `[probe]`. Register it with `stonecutter handlers { inherit("aw", "properties") }`.
-- On 0.10 global replacements also rewrite the comment-less formats: a global string replacement changed `.json`, `.toml`, and `.txt` resources and left an unregistered extension alone `[probe]`. Before upgrading, search resources for every global replacement key, then scope the replacement with an identifier or an `exclude()` filter where a data file must keep the old text.
+- On 0.10 global replacements also apply to the newly registered formats, including the comment-less ones (`.json`, `.toml`, `.txt` confirmed `[probe]`); unregistered extensions are left alone. Before upgrading, search resources for every global replacement key, then scope the replacement with an identifier or an `exclude()` filter where a data file must keep the old text.
 - Reuse a handler with `inherit("aw", "your_extension")` before writing an ANTLR-backed custom handler. Custom scanner, commenter, and format APIs changed on 0.10 `[changelog]`; an addon or hand-written handler needs a port.
 
 ## Excluding and disabling files
 
-- Exclusion is exclusion-only on both lines; never `include`.
+- File filters (`filters` / `files`) are exclusion-only on both lines: an `include` there is reported at build time and can have undefined side effects `[wiki]`. Replacement filters are a separate API and do support `include()`.
 - 0.9.x: `stonecutter.filters.exclude("java/com/example/Bad.java")`, relative to each `src/<source-set>/` `[wiki]`.
 - 0.10: `stonecutter.files.exclude("com/example/Bad.java")`, relative to every source directory of every source set, so the `java/` or `resources/` segment must be dropped `[changelog]`. A pattern carried over unchanged silently matches nothing.
 - 0.10 `files.disable(direction, patterns)` comments the file out with a `stonecutter-disabled` marker and removes it from the build `[wiki]`. Prefer it to a whole-file condition for version-only classes; it is not a substitute for excluding an overridden shared file.
