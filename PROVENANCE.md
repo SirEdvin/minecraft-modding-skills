@@ -4,7 +4,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 
 ## Official Documentation Used
 
-`minecraft-fabric-modding`:
+`fabric-modding`:
 
 - https://docs.fabricmc.net/develop/
 - https://docs.fabricmc.net/develop/loader/
@@ -13,7 +13,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://docs.fabricmc.net/develop/data-generation/setup
 - https://github.com/FabricMC/fabric-docs/tree/main/reference/latest
 
-`minecraft-neoforge-modding`:
+`neoforge-modding`:
 
 - https://docs.neoforged.net/docs/gettingstarted/
 - https://docs.neoforged.net/docs/1.21.1/gettingstarted/
@@ -25,7 +25,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 - https://docs.neoforged.net/docs/resources/
 - https://github.com/neoforged/ModDevGradle
 
-`minecraft-legacy-forge-modding`:
+`neoforge-legacy-modding`:
 
 - https://docs.minecraftforge.net/en/1.20.x/
 - https://docs.minecraftforge.net/en/1.20.x/concepts/registries/
@@ -142,3 +142,19 @@ The 0.2.0 skill update checks Stonecutter 0.9.8 stable and 0.10-beta.1 prereleas
 - https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/main/projects/testiarium-core
 - https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/main/projects/testiarium-forge
 - https://github.com/SirEdvin/Minecraft-Modding-Libs/tree/main/projects/testiarium-fabric
+
+## Stonecutter documentation refresh (2026-09-06)
+
+The 0.9.8 refresh adds independently distilled notes from these official pages:
+
+- https://stonecutter.kikugie.dev/wiki/v2/
+- https://stonecutter.kikugie.dev/wiki/v2/reference/gradle-api/structured-properties
+- https://stonecutter.kikugie.dev/wiki/v2/reference/gradle-api/data-driven-setup
+- https://stonecutter.kikugie.dev/wiki/v2/reference/gradle-api/project-controller
+- https://stonecutter.kikugie.dev/wiki/v2/reference/syntax/replacements
+- https://stonecutter.kikugie.dev/blog/changes/0.9
+- https://plugins.gradle.org/plugin/dev.kikugie.stonecutter
+
+The portal listed 0.9.8 while the live wiki described some 0.10 APIs. The package references explicitly version-gate those APIs and preserve disagreements between wiki and changelog rather than asserting unverified historical availability. Earlier source/template commit observations above remain historical; this refresh does not imply reinspection of those commits.
+
+Refresh verification used a disposable Java-only fixture with Stonecutter 0.9.8, Gradle 9.6.1, and Java 21. Both nodes (1.20.1 and 1.21.1) compiled; JSON tree loading, merged structured properties, typed integer access, colon-path raw-list access, generated inactive sources, and named reversible string replacement were exercised. Separate refresh/switch/reset invocations succeeded, and the source round trip was byte-identical after initial comment normalization. Combining reset and build in one invocation failed Gradle implicit-dependency validation; separating them passed. Minecraft loader runtimes, publishing services, and forward-looking 0.10 APIs were not exercised.

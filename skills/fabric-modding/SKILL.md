@@ -1,9 +1,10 @@
 ---
 name: fabric-modding
-description: Fabric Minecraft mod development guidance based on Fabric Loader, Fabric API, Fabric Loom, Yarn mappings, and official Fabric docs. Use when working on Fabric mods, fabric.mod.json, ModInitializer, ClientModInitializer, Fabric API events, registries, items, blocks, data generation, networking payloads, mixins, access wideners, Loom Gradle setup, client/server environment safety, or porting between Fabric and Forge/NeoForge.
+description: Develop Fabric mods with version-matched tooling and APIs.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
+  author: "minecraft-modding-skills contributors"
 ---
 
 # Fabric Modding
@@ -14,27 +15,28 @@ Use this skill to implement or review Minecraft mods targeting Fabric. Prefer th
 
 - Confirm versions from `gradle.properties`, `build.gradle`, `settings.gradle`, and `fabric.mod.json`.
 - Confirm the mod id, Maven group, base package, entrypoints, mixin configs, and resource namespace all match.
-- Expect the Gradle plugin `net.fabricmc.fabric-loom`; do not replace it with ForgeGradle, NeoGradle, or ModDevGradle.
+- Identify the applied Loom version, including convention plugins. Current Loom uses `net.fabricmc.fabric-loom-remap` for ≤1.21.11 and `net.fabricmc.fabric-loom` for ≥26.1; older projects may use `fabric-loom` or a compatibility wrapper. Do not replace working tooling just to match a plugin spelling.
 - Use the Java version required by the target Minecraft version. Modern Fabric templates may target Java 21 or newer; older versions can differ.
 - Prefer generated Gradle tasks: `./gradlew build`, `./gradlew runClient`, `./gradlew runServer`, `./gradlew runDatagen` when configured.
-- Use Fabric/Yarn names. Do not mix in Forge/NeoForge imports such as `net.minecraftforge.*` or `net.neoforged.*`.
+- Read the mapping configuration: pre-26.1 Fabric supports Yarn **or Mojang mappings**; 26.1 uses unobfuscated official names. Mojang-named vanilla imports do not imply Forge. Keep loader imports Fabric-specific.
 
 ## Build Tooling
 
-- Keep version values in `gradle.properties`: `minecraft_version`, `loader_version`, `loom_version`, `fabric_api_version`, `mod_version`, and `maven_group`.
-- Declare dependencies with Loom configurations:
+- Preserve the existing property owner: Gradle properties, version catalog, convention plugin, or Stonecutter structured properties. Do not create conflicting duplicate version keys.
+- For **remapping Loom on ≤1.21.11**, declare dependencies with Loom configurations:
   - `minecraft "com.mojang:minecraft:${project.minecraft_version}"`
   - `mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"` when the project declares Yarn explicitly
   - `modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"`
   - `modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"`
-- Use `modImplementation`, `modCompileOnly`, `modRuntimeOnly`, `include`, or `modApi` for mod dependencies so Loom can remap them.
+- On remapping Loom, use `modImplementation`, `modCompileOnly`, `modRuntimeOnly`, or `modApi` (when exposed). `include` is separate, non-transitive jar-in-jar packaging, not a substitute for the compile dependency.
+- On 26.1+, remove `mappings`, use ordinary `implementation`/`compileOnly`/`runtimeOnly`/`api`, and distribute `jar` rather than `remapJar`. Match access-file namespaces to `official`. See [version contracts](references/version-contracts.md).
 - Use `loom { splitEnvironmentSourceSets() }` when the project has a separate client source set; bind both `main` and `client` source sets under `loom.mods`.
 - Expand `${version}` or other metadata in `processResources`, but keep `fabric.mod.json` valid JSON after expansion.
-- Publish or distribute the remapped production jar from `build/libs`, not an unremapped development artifact.
+- For ≤1.21.11 publish the remapped production jar, not the named development artifact. For ≥26.1 inspect the normal `jar` output and any publication overrides.
 
 ## Project Structure
 
-- Put common Java code in `src/main/java`.
+- Discover actual roots before editing: common Java normally lives in `src/main/java`, but Kotlin, shared modules, Stonecutter overrides, and generated node sources can change the effective inputs. Edit canonical sources, not processed outputs.
 - Put client-only Java code in `src/client/java` when `splitEnvironmentSourceSets()` is enabled, or isolate it behind client entrypoints/classes when not.
 - Put runtime resources in `src/main/resources`.
 - Use `src/main/resources/assets/<modid>` for client assets and `src/main/resources/data/<modid>` for server data.
@@ -69,14 +71,14 @@ public final class ExampleMod implements ModInitializer {
 
 ## Registries
 
-- Use vanilla registries through `net.minecraft.registry.Registries` and `net.minecraft.registry.Registry`.
+- Use vanilla registries in the project namespace: Yarn uses `net.minecraft.registry.Registries`/`Registry`; Mojang mappings use `net.minecraft.core.registries.BuiltInRegistries`/`net.minecraft.core.Registry`.
 - Create identifiers with the API used by the target version, usually `Identifier.of(MOD_ID, "path")` or `Identifier.ofVanilla("path")` in newer Yarn versions.
 - Register objects during mod initialization, before registry freeze.
 - Keep registered objects as static final singleton instances.
 - Keep registry paths lowercase snake_case.
 - For items and blocks in newer versions, set the registry key on settings/properties when the target API requires it. Check project mappings before copying examples.
 
-Typical item registration shape:
+Yarn-only illustration for versions with `Item.Settings#registryKey` (not 1.21.1, Mojang-mapped Fabric, or 26.1). Prefer the target version’s generated `Items` source over this shape:
 
 ```java
 public final class ModItems {
@@ -117,7 +119,7 @@ public final class ModItems {
 - Use `ClientModInitializer` for key bindings, screens, renderers, model predicates, color providers, particles, and client networking handlers.
 - Never load `net.minecraft.client.*` classes from common entrypoints or common static initializers.
 - With split source sets, put client-only code under `src/client/java` and common code under `src/main/java`.
-- Use `world.isClient()` for logical-side checks. Run authoritative gameplay only when it is `false`.
+- Use the target logical-side accessor (`World#isClient` in Yarn, `Level#isClientSide` in Mojang names; field/method form varies). Run authoritative gameplay only on the logical server; this check does not isolate client classes.
 - Remember an integrated singleplayer game has both logical client and logical server inside a physical client.
 - Always run `runServer` after touching common code to catch accidental client-only class loading.
 
@@ -162,7 +164,7 @@ public final class ModItems {
 - Run `./gradlew build` after code or metadata changes.
 - Run `./gradlew runClient` for assets, models, screens, rendering, key bindings, particles, client events, and client networking.
 - Run `./gradlew runServer` for common initialization, registries, networking, commands, resources, mixins, and classloading safety.
-- Run `./gradlew runDatagen` after datagen changes and inspect generated output.
+- Discover configured datagen runs with `./gradlew tasks --all` before invoking `runDatagen`; it is not guaranteed to exist. In a multi-project build use the exact node task path and inspect generated output.
 - Check logs for missing models/textures/translations, registry errors, invalid `fabric.mod.json`, mixin apply failures, access widener errors, packet registration errors, and client-only class loading on server.
 
 ## Official References

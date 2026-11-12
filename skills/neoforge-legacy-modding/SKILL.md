@@ -1,9 +1,10 @@
 ---
 name: neoforge-legacy-modding
-description: NeoForge Legacy Forge / MinecraftForge 1.17-1.20.1 mod development guidance using NeoForged ModDevGradle's legacyforge plugin. Use when working on 1.20.1-legacy MDK projects, net.neoforged.moddev.legacyforge, Forge 47.x, net.minecraftforge.* APIs, mods.toml, DeferredRegister with RegistryObject, FMLJavaModLoadingContext, MinecraftForge.EVENT_BUS, SimpleChannel networking, Forge datagen, access transformers, mixins, reobfuscation, or porting between legacy Forge 1.20.1 and modern NeoForge.
+description: Develop legacy Forge mods with ModDevGradle.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
+  author: "minecraft-modding-skills contributors"
 ---
 
 # NeoForge Legacy Modding
@@ -16,25 +17,26 @@ Use this skill for MinecraftForge-compatible legacy projects maintained with Neo
 - Expect `id 'net.neoforged.moddev.legacyforge'` in `build.gradle`; do not replace it with modern `net.neoforged.moddev` or NeoGradle unless explicitly porting.
 - For Minecraft 1.20.1, target Java 17. Do not apply modern NeoForge 1.21+ Java 21 assumptions.
 - Confirm the mod id in `gradle.properties`, the `@Mod` value, resource namespaces, and `src/main/templates/META-INF/mods.toml` all match.
-- Use generated Gradle tasks first: `./gradlew build`, `./gradlew runClient`, `./gradlew runServer`, `./gradlew runData`, and `./gradlew gameTestServer` when configured.
+- Discover tasks with `./gradlew tasks --all`: configured runs normally expose `runClient`, `runServer`, `runData`, and `runGameTestServer` (not the run name `gameTestServer`). Qualify the node path in multiversion builds; a minimal template may configure no runs.
 - When checking APIs, prefer Forge 1.20.1 docs and project source over current NeoForge docs. Modern NeoForge docs are useful for concepts, but many package names and APIs differ.
 
 ## Build Tooling
 
 - Configure Forge through the `legacyForge { version = "${minecraft_version}-${forge_version}" }` block.
-- Keep common metadata in `gradle.properties`: `minecraft_version`, `forge_version`, `minecraft_version_range`, `forge_version_range`, `loader_version_range`, `mod_id`, `mod_version`, and display fields.
+- Preserve the repository’s metadata/property owner (Gradle properties, catalog, or structured Stonecutter properties). Read [legacy build contracts](references/version-contracts.md) for inspected layouts and task/publication caveats.
 - Use `legacyForge.runs` for `client`, `server`, `gameTestServer`, and `data`; set `forge.enabledGameTestNamespaces` to the mod id when using game tests.
 - Include generated datagen output with `sourceSets.main.resources { srcDir 'src/generated/resources' }`.
-- Legacy Forge production jars need reobfuscation to SRG. Upload the reobfuscated `reobfJar` output, not the development jar under `build/devlibs`.
+- Legacy Forge production jars need reobfuscation to SRG. Inspect the pinned plugin’s production artifact and outgoing variants; some versions do not expose a task named `reobfJar`. Do not upload a named development artifact.
 - For mod dependencies, use `modImplementation`, `modCompileOnly`, `modRuntimeOnly`, `modApi`, or a custom remapping configuration created with `obfuscation.createRemappingConfiguration`. These remap published SRG jars to official mappings for development.
-- Use `localRuntime` plus `modLocalRuntime` for optional runtime-only test dependencies that should not become published dependencies.
+- Legacy remapping configurations are **non-transitive**: explicitly supply required transitive mod dependencies. `modApi`/`modCompileOnlyApi` require `java-library`.
+- For local-only remapped mods, first create a non-published runtime configuration (e.g. `localRuntime`) and call `obfuscation.createRemappingConfiguration` to create its `modLocalRuntime` counterpart; do not assume that pair exists automatically.
 - Configure mixins with the Mixin annotation processor, a refmap, a mixin config file, and a `MixinConfigs` manifest attribute.
 
 ## Project Shape
 
 - Put Java code in `src/main/java`, runtime resources in `src/main/resources`, metadata templates in `src/main/templates`, and generated resources in `src/generated/resources`.
 - Use `src/main/resources/assets/<modid>` for client assets and `src/main/resources/data/<modid>` for server data.
-- Keep `META-INF/mods.toml` generated from templates when the MDK already has `generateModMetadata`; edit `gradle.properties` for basic metadata instead of hardcoding expanded files.
+- Keep `META-INF/mods.toml` generated from templates when the MDK has `generateModMetadata`. Other projects expand checked-in resources or version overrides in `processResources`; edit those inputs, never expanded build output. Verify exactly one loader’s metadata ships.
 - Use `mods.toml` dependency ids `forge` and `minecraft` for Forge 1.20.1 projects. Do not rename them to `neoforge`.
 - Keep common code free of `net.minecraft.client` imports. Isolate client-only setup in client classes or `@Mod.EventBusSubscriber(..., value = Dist.CLIENT)`.
 
@@ -84,10 +86,10 @@ public ExampleMod() {
 ## Networking
 
 - Use Forge `SimpleChannel` from `net.minecraftforge.network.simple`.
-- Create channels with `NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), protocolSupplier, clientPredicate, serverPredicate)`.
+- For Forge patches exposing the classic SimpleImpl API, create channels with `NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), protocolSupplier, clientPredicate, serverPredicate)`.
 - Register packets with unique per-channel discriminators. Keep IDs deterministic, usually with `int id = 0; id++`.
 - Packet registration supplies encoder, decoder, and handler functions using `FriendlyByteBuf`.
-- Packet handlers run on the network thread by default; call `ctx.get().enqueueWork(...)` before touching world, player, block entity, or client state, then call `ctx.get().setPacketHandled(true)`.
+- The classic `registerMessage` handler runs on the network thread: enqueue game-state work and mark handled. Newer Forge 47.x channel/builder APIs can choose main-thread consumers; inspect the pinned Forge API rather than assuming identical registration signatures across patches.
 - For serverbound packets, validate all client-provided data. Check `Level#hasChunkAt` before reading block entities or blocks at client-sent positions.
 - Handle clientbound packets in client-only classes and cross the physical-side boundary with `DistExecutor` or an equivalent client-only event subscriber.
 - Send to the server with `CHANNEL.sendToServer(message)` and to clients with `CHANNEL.send(PacketDistributor.PLAYER.with(...), message)`, `TRACKING_CHUNK`, `ALL`, or other Forge packet distributors.

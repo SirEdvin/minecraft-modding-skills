@@ -1,10 +1,11 @@
 ---
 name: minecraft-26-1-migration
-description: Use when planning or executing a source-backed migration of a Minecraft Java mod from 1.21.x to the 26.1.x line on Fabric, NeoForge, or a multi-loader build. Requires a migration brief and explicit architecture decisions before code changes.
+description: Migrate Minecraft mods from 1.21.x to 26.1.x.
 license: MIT
 compatibility: Minecraft Java Edition mods moving from any 1.21.x release to 26.1 or a 26.1 patch on Fabric, NeoForge, or a multi-loader architecture; exact loader, plugin, dependency, mapping, and patch versions are version-sensitive.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
+  author: "minecraft-modding-skills contributors"
 ---
 
 # Minecraft 1.21.x → 26.1 Mod Migration
@@ -41,7 +42,7 @@ If an answer changes architecture, save compatibility, public API, loader suppor
 Collect evidence before planning:
 
 - build system, wrapper, plugins, dependency catalog, Java toolchain, mappings, and publication tasks;
-- module/source-set graph and loader boundaries;
+- module/source-set graph and loader boundaries, canonical/VCS source state, per-version overrides, and processed outputs;
 - mod metadata, entrypoints, Mixins, access wideners, access transformers, coremods, reflection, and generated sources;
 - registries, custom codecs, components, attachments, NBT/value I/O, recipes, loot, tags, worldgen, configs, and saved data;
 - packet definitions, codecs, handlers, phases, directions, permissions, and threading;
@@ -96,7 +97,7 @@ Never combine a mapping conversion, loader redesign, public API redesign, and be
 
 1. Inspect the official template for the exact target patch; do not hard-code release-day dependency versions.
 2. Use Java 25 throughout local builds, CI, IDE configuration, test launchers, and tools requiring `jmods`.
-3. Prefer reconstructing the target build from a clean official template, then deliberately reapply modules, publication, access changes, runs, and dependencies.
+3. Compare against a clean official template; rebuild only the affected target configuration. In a maintained multiversion tree retain old nodes, their remapping plugins/toolchains, shared module graph, and publication contracts. Do not replace the entire build with a single-version MDK.
 4. On Fabric 26.1+, use official unobfuscated names, remove the mappings dependency, use the non-remapping Loom plugin, ordinary dependency configurations, normal `jar`, and `official` access-widener namespace. Convert Yarn while still on the old version when practical.
 5. On NeoForge, use a current 26.1 MDK/ModDevGradle contract and review ModDevGradle 2 breaking changes. Parchment is optional for documentation, not required for names.
 6. Preserve artifact coordinates and consumers unless the migration brief approves a breaking publication change.
@@ -160,10 +161,10 @@ Run the real tasks defined by the repository; discover names rather than assumin
 8. copy-based upgrade test of a representative old world/save/config when compatibility is required;
 9. multiplayer packet tests, including invalid client input;
 10. each supported loader and required integration combination;
-11. published JAR inspection for metadata, access files, nested dependencies, classifiers, and accidental client classes;
+11. published JAR inspection for metadata, access files, nested dependencies, classifiers, and client-class reachability (a universal JAR legitimately contains gated client classes);
 12. Mixin verification against actual target bytecode plus runtime launch.
 
-Capture exact commands and real outcomes. A successful compile is not a completed migration.
+Capture exact commands and real outcomes, including each supported node and restoration of the canonical/VCS source state. If the project has no GameTests or unavailable dependencies, record that gap rather than inventing a task or claiming the gate passed. A successful compile is not a completed migration.
 
 ## Completion report
 

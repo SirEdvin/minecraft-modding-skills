@@ -1,9 +1,10 @@
 ---
 name: kubejs-modding
-description: KubeJS Minecraft modpack scripting guidance based on the official KubeJS wiki and source. Use when writing or reviewing KubeJS scripts, startup_scripts, server_scripts, client_scripts, recipe changes, item/block/fluid/entity registry scripts, tags, loot, custom events, Java.type/Java.loadClass usage, ProbeJS typings, mod integrations, reload behavior, server/client safety, or pack-dev automation for Forge, NeoForge, or Fabric modpacks.
+description: Write version-aware KubeJS pack scripts.
 license: MIT
 metadata:
-  version: "1.0.1"
+  author: "SirEdvin"
+  version: "1.1.0"
 ---
 
 # KubeJS Modding
@@ -31,8 +32,8 @@ Use this skill to implement or review KubeJS scripts for Minecraft modpacks. Pre
 
 - Use `/reload` for server scripts and data/resource changes that participate in datapack reload.
 - Restart the game/server after changing startup scripts or registries. Registry changes cannot be safely hot-reloaded.
-- KubeJS-specific `/kubejs reload startup_scripts`, `/kubejs reload server_scripts`, and `/kubejs reload client_scripts` commands can reevaluate top-level code, but they do not rerun registration or replace listeners already registered. Do not treat them as lifecycle substitutes.
-- Use `/kubejs errors` or the current KubeJS error command for script errors when available.
+- In the reviewed KubeJS 2001 source, script reload clears that script type’s event handlers and loads scripts again; listeners can be replaced. However `/kubejs reload server_scripts` does not itself reload recipes/tags/loot: use `/reload`. Registry startup changes still require a full restart. See the pinned lifecycle reference below.
+- Use `/kubejs errors server` (or `startup` / `client`) on KubeJS 2001, or the matching version’s error command for script errors when available.
 - Check `logs/kubejs/server.log`, `logs/kubejs/client.log`, normal latest logs, and crash reports after changes.
 - Use ProbeJS to generate typings and inspect available globals, events, classes, and addon APIs for the current pack.
 - Validate recipes and tags in-game with JEI/REI/EMI and logs, not just by checking that scripts parse.
@@ -60,7 +61,7 @@ Use this skill to implement or review KubeJS scripts for Minecraft modpacks. Pre
 - Use tags for interchangeable inputs instead of enumerating every item when the pack has a stable tag convention.
 - Test removed and added recipes in JEI/REI/EMI and by crafting/smelting when the recipe affects progression.
 
-Typical recipe shape:
+KubeJS 6 / Minecraft 1.20.1 Forge recipe example (the `forge` item tag must exist):
 
 ```js
 ServerEvents.recipes(event => {
@@ -71,7 +72,7 @@ ServerEvents.recipes(event => {
     ' S ',
     ' S '
   ], {
-    I: '#c:ingots/iron',
+    I: '#forge:ingots/iron',
     S: 'minecraft:stick'
   }).id('kubejs:iron_pickaxe_from_tagged_iron')
 })
@@ -85,7 +86,7 @@ ServerEvents.recipes(event => {
 - Restart after registry changes and check startup logs for duplicate IDs or invalid builder properties.
 - Add models, textures, blockstates, lang, loot, tags, and recipes for custom entries under `kubejs/assets` and `kubejs/data` or through scripts/datagen-style helpers.
 
-Typical item registration shape:
+KubeJS 6 / Minecraft 1.20.1 startup item example:
 
 ```js
 StartupEvents.registry('item', event => {
@@ -113,7 +114,7 @@ StartupEvents.registry('item', event => {
 
 ## Java Interop
 
-- Prefer KubeJS wrappers and event APIs before using `Java.type` or `Java.loadClass`.
+- Prefer KubeJS wrappers and event APIs before using Java interop. On the reviewed 2001 line use `Java.loadClass`; `Java.type` is not present in its Java wrapper.
 - When Java interop is needed, load classes lazily inside the script or handler that uses them.
 - Avoid client-only Java classes in server scripts and common startup code.
 - Treat Java objects as version-specific. Check ProbeJS typings, generated docs, or decompiled sources before calling methods.
@@ -158,3 +159,7 @@ StartupEvents.registry('item', event => {
 - ProbeJS: `https://github.com/Prunoideae/ProbeJS`
 - Rhino: `https://github.com/KubeJS-Mods/Rhino`
 - KubeJS Maven/releases: `https://maven.latvian.dev/#/releases/dev/latvian/mods`
+
+## Versioned source checks
+
+Read [lifecycle and schema boundaries](references/versioned-lifecycle.md) before porting scripts or developing a compiled plugin.
