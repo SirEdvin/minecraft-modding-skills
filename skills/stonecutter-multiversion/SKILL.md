@@ -4,7 +4,7 @@ description: Use when editing Stonecutter builds. Version-match its APIs.
 license: MIT
 compatibility: Stonecutter 0.10 needs Gradle 9.7+ on a Java 25 launcher; 0.9.8 needs Gradle 9.0+ on a Java 21 launcher. The two lines differ in API and defaults, so match every example to the pinned plugin version.
 metadata:
-  version: "0.3.1"
+  version: "0.3.2"
   author: Hermes
   hermes-tags: "Stonecutter, Gradle, Minecraft, Modding"
 ---
