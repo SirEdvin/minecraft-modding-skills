@@ -1,53 +1,45 @@
 # Controller, task orchestration, and replacement mechanics
 
-## Sources
-- Controller: https://stonecutter.kikugie.dev/wiki/v2/reference/gradle-api/project-controller
-- Replacements: https://stonecutter.kikugie.dev/wiki/v2/reference/syntax/replacements
-- Release history: https://stonecutter.kikugie.dev/blog/changes/0.9
-- Reviewed 2026-09-06; the current wiki mixes released 0.9.x behavior and forward-looking 0.10 APIs.
-
 ## Execution model
-- Controller script executes once in configuration; the build template executes for every node.
-- `parameters {}` lazily supplies preprocessing configuration, not arbitrary node task/dependency configuration.
-- Use ordinary node build scripts for dependencies and task wiring.
-- Assign active exactly once: literal, file-backed, or detached `null`.
-- Put programmatic flags before active initialization.
-- The 0.10 wiki calls the version container `targets`; released 0.9.x uses `dependencies`. The old name is documented as a deprecated alias in 0.10.
-- Controller examples still use `node.project.property`; the 0.9.7 changelog recommends `project.property` instead. For 0.10 structured values, also account for the property-access migration in the companion reference.
+
+- The controller script runs once during configuration; the build template runs for every node.
+- `parameters {}` lazily supplies preprocessing configuration. Dependencies and task wiring belong in node build scripts.
+- Assign the active node exactly once: literal, file-backed, or detached `null`. Put programmatic flags before that statement.
+- 0.9.x requires `plugins { id("dev.kikugie.stonecutter") }` in the controller `[probe]`; 0.10 applies the plugin itself and treats the block as a no-op `[probe]`.
+- The predicate-version container is `dependencies` on 0.9.x and `targets` on 0.10; the old name still works on 0.10 with a deprecation warning `[probe]`.
+- Read the active node in the controller with `stonecutter.current` on 0.9.x and `stonecutter.active` on 0.10 `[changelog]`.
 
 ## Lazy task aggregation
-Documented Kotlin shape, valid only when the selected publishing plugin registers `publishMods`:
+
+Valid only for a task the applied plugins actually register on the nodes:
 
 ```kotlin
-tasks.register("publishModsAndAnnounce") {
+tasks.register("publishAll") {
     group = "publishing"
-    val publishMods = stonecutter.tasks.named("publishMods")
-    dependsOn(publishMods)
-    doLast {
-        // Add an approved announcement implementation here.
-    }
+    dependsOn(stonecutter.tasks.named("publishMods"))    // 0.9.x
+    // dependsOn(stonecutter.tasks.names("publishMods")) // 0.10
 }
 ```
 
-- This is an API pattern, not a ready publishing workflow or permission to publish.
-- Keep the lazy collection as a dependency; do not force it with `.get()`.
-- Filter example: `stonecutter.tasks.named("publishMods") { metadata.project.endsWith("-snapshot") }`.
-- Inspect `./gradlew tasks --all` through `terminal` before using any task name from examples.
+- `named` returns lazy task providers; never force it with `.get()`.
+- `names` (0.10) returns qualified task paths and is the only form that works with Isolated Projects; `named` still works on 0.10 with a deprecation warning `[probe]`.
+- Both accept a node filter: `{ metadata.project.endsWith("-snapshot") }`.
+- This is an API pattern, not a publishing workflow or permission to publish. Read `tasks --all` before using a task name from an example.
 
 ## Ordering versus dependencies
-- `order` controls only the named task, not its prerequisites or downstream consumers.
+
+- `order` controls only the named task, not its prerequisites or consumers.
 - Register ordering at most once per task; duplicates can create cycles.
-- Default ordering parses each node's logical version, not its project identifier.
-- Order concrete publishing tasks, not only an umbrella task that delegates to them.
-- Documented concrete examples: `order("publishModrinth")` and `order("publishCurseforge")`.
-- A version-then-loader comparator is documented as `versionComparator.thenComparingInt { if (it.metadata.project.endsWith("fabric")) 1 else 0 }`.
-- Wiki says missing-task leniency starts in 0.9; the release changelog specifically records the change in 0.9.3. For 0.9.0–0.9.2, verify rather than assuming leniency.
-- 0.9.7 changed ordering from lock files to a build service limiting parallelism, including fixes for tasks such as `compileJava`.
-- Do not serialize an entire build merely because one artifact-generation task is concurrency-sensitive.
+- Default ordering parses each node's logical version, not its project name. Add a comparator for loader order: `versionComparator.thenComparingInt { if (it.metadata.project.endsWith("fabric")) 1 else 0 }`.
+- Order concrete publishing tasks, not an umbrella task that only delegates.
+- Missing tasks are skipped from 0.9.3; older versions fail `[changelog]`.
+- The underlying lock is available as `StonecutterTaskMutexService.create(gradle, "name")` for `usesService(...)` in any build script on both lines `[source]`, although the wiki documents it from 0.10. It prevents parallel runs without promising an order.
+- Do not serialize an entire build because one artifact-generation task is concurrency-sensitive.
 
 ## Lifecycle wiring
-- Tasks in `stonecutter-impl` are implementation tasks, not normal manual entry points.
-- NeoForge integration example belongs in the node build template:
+
+- Tasks in the `stonecutter-impl` group are implementation tasks, not manual entry points.
+- Loader artifact generation must see generated sources. In the node build template:
 
 ```kotlin
 tasks.named("createMinecraftArtifacts") {
@@ -55,40 +47,45 @@ tasks.named("createMinecraftArtifacts") {
 }
 ```
 
-- This dependency wiring differs from invoking `stonecutterGenerate` manually.
-- Documented switch customization: `for ((project, switch) in stonecutter.tasks.switch) switch.configure { }`.
-- Internal `stonecutterSwitchTo...` tasks are used by the IntelliJ integration; discover user-facing switch tasks instead of inventing internal suffixes.
+- 0.10 merged `stonecutterPrepare` into `stonecutterGenerate` `[changelog]`; depend on `stonecutterGenerate` only.
+- Customize switching with `for ((project, switch) in stonecutter.tasks.switch) switch.configure { }`.
+- `stonecutterSwitchTo...` tasks exist for the IDE integration. Use the discovered `Set active project to ...` tasks.
 
-## Flag diagnosis
-All properties below have prefix `dev.kikugie.stonecutter.` and live in controller-root `gradle.properties`.
+## Flags
 
-| Suffix | Purpose / documented current default |
-| --- | --- |
-| `hard_mode` | Suppress Groovy limitation warning; false; property-only |
-| `auto_apply_plugin` | Apply plugin to nodes; true |
-| `generate_sources_on_sync` | Generate during IntelliJ Gradle sync; true |
-| `generate_switch_actions` | Create IntelliJ switch run configurations; true |
-| `serialize_tree_model` | Write model cache for IDE/addon tooling; true |
-| `extra_source_check` | Second source-directory discovery pass; true |
-| `implicit_receiver` | Default predicate target; `minecraft` |
-| `generate_manifest` | Include Stonecutter JAR metadata; true |
+Properties have the prefix `dev.kikugie.stonecutter.`. Controller-scoped flags are read from the `gradle.properties` beside the controller; `hard_mode` is read by the settings plugin, so set it in the root `gradle.properties` `[source]`. Suffixes and defaults below match the 0.10 source `[source]`.
 
-- A preprocessing error can break IDE sync when source generation on sync is enabled; the current documented default is enabled, so diagnose rather than assuming the user opted in.
-- Late-added source directories motivate `extra_source_check`; do not disable it casually during addon integration.
-- `StonecutterFlag.LINE_SEPARATOR` is documented for 0.10 only; no property key is documented, so do not invent one.
-- The wiki dates `GENERATE_MANIFEST` to 0.8, but the 0.9 changelog explicitly introduces the flag in 0.9.4. Treat availability before 0.9.4 as unresolved without tagged-source verification.
-- Manifest fields documented: `Stonecutter-Plugin-Version`, `Stonecutter-Gradle-Version`, `Stonecutter-Node-Project`, `Stonecutter-Node-Version`.
-- These can help inspect artifact provenance; they do not replace compile/runtime testing.
+| Suffix | Purpose | Default |
+| --- | --- | --- |
+| `hard_mode` | Opt into Groovy scripts and silence the limitation notice | false |
+| `auto_apply_plugin` | Apply the plugin automatically: to nodes on 0.9.x, to nodes and the controller on 0.10. Same property on both lines; only the Kotlin constant changed from `APPLY_PLUGIN_TO_NODES` to `AUTO_APPLY_PLUGIN` | true |
+| `generate_sources_on_sync` | Generate sources during IDE Gradle sync | true |
+| `generate_switch_actions` | Create IDE switch run configurations | true |
+| `serialize_tree_model` | Write model cache for IDE/addon tooling | true |
+| `extra_source_check` | Second source-directory discovery pass | true |
+| `implicit_receiver` | Default predicate target | `minecraft` |
+| `generate_manifest` | Add Stonecutter attributes to JAR manifests | true |
+| `line_separator` (0.10) | Force a line ending in processed files; empty preserves | empty |
+| `short_extension` (0.10) | Register the `sc` alias; property-only | true |
+| `expose_properties` (0.10) | Mirror structured properties into project properties | true |
+| `warn_duplicate_properties` (0.10) | Warn on overwritten structured keys | false |
+| `suppressed_warnings` (0.10) | Mute listed warning IDs; errors cannot be muted | empty |
+
+- 0.10 scopes flags: settings flags are set in `settings.gradle(.kts)`, controller flags in the controller, node and local flags in build scripts; a script cannot overwrite a flag of another scope `[changelog]`.
+- With generation on sync enabled, a preprocessing error breaks IDE sync. Fix the preprocessing error; the sync integration is working as designed.
+- Do not disable `extra_source_check` casually; late-added source directories depend on it.
+- JAR manifests carry `Stonecutter-Plugin-Version`, `Stonecutter-Gradle-Version`, `Stonecutter-Node-Project`, and `Stonecutter-Node-Version` (0.10 `[probe]`). They show which node and plugin built an artifact; they do not replace compile or runtime testing.
 
 ## Replacement selection
-- Prefer a condition for isolated alternate code blocks, a swap for repeated whole fragments, and a string replacement for reversible textual renames.
-- The boolean passed to `replacements.string` is direction: true maps old to new; false reverses the map.
-- String matching considers both input and output patterns, preventing already-replaced text from expanding repeatedly.
-- Regex needs explicit forward and reverse patterns; the engine cannot infer an inverse from replacement text.
-- Do not use regex solely to avoid naming the exact literal to replace.
-- String replacements have ambiguity/cycle checks; regex cannot provide the same guarantees.
+
+- Prefer a condition for an isolated alternate block, a swap for a repeated fragment, and a string replacement for a reversible rename.
+- The boolean passed to `replacements.string` is direction: true maps old to new, false reverses.
+- String matching considers both input and output patterns, so already-replaced text is not expanded again.
+- Regex needs explicit forward and reverse patterns; the engine cannot infer an inverse. Do not use regex only to avoid naming a literal.
+- On 0.9.x ambiguous or cyclic string mappings are rejected at configuration. On 0.10 validity is checked while processing, ambiguity is still an error, and a cycle is left unreplaced `[changelog]`.
 
 ## Named global replacement state
+
 ```kotlin
 stonecutter {
     replacements.string(current.parsed >= "1.21", "me_imports") {
@@ -97,28 +94,30 @@ stonecutter {
 }
 ```
 
-- Unnamed global replacements affect all processed files.
+- Unnamed global replacements affect every processed file. On 0.10 that includes JSON and other comment-less resource formats; see the source-syntax reference before upgrading.
 - An identifier disables a replacement by default; register `"!me_imports"` to enable it by default.
-- `//~ me_imports` enables subsequent processing; `//~ !me_imports` disables it.
-- This is set/reset behavior, not toggling: repeated disable directives remain disabled.
-- Multiple IDs fit in one directive: `//~ enable_me !disable_me`.
-- Place the enabling directive before code if the replacement must affect the whole file; later directives deliberately affect only subsequent regions.
+- `//~ me_imports` enables subsequent processing; `//~ !me_imports` disables it. This is set/reset, not a toggle.
+- Several IDs fit in one directive: `//~ enable_me !disable_me`.
+- Put the enabling directive before code when the whole file needs it; later directives affect only what follows.
+- Pass direction first, then the identifier; the identifier-first overload is deprecated on both lines `[source]`.
 
 ## Local replacement scope
+
 - A local replacement has its own scope and can nest; nested replacements accumulate.
-- Example opener: `//~ if >=1.21 '.getName()' -> '.name' {`; closer: `//~}`.
-- Simple identifier values may omit quotes; other values use single quotes, escaping embedded quotes with `\'`.
-- The current wiki also documents `as name_getter` and anonymous `as _` declarations for the rest of the file. These are unavailable in 0.9.x; do not add them to that release line.
-- Named local declarations can share IDs with each other or globals, linking activation behavior; use distinct identifiers unless sharing is intentional.
+- Opener `//~ if >=1.21 '.getName()' -> '.name' {`, closer `//~}`.
+- Simple identifier values may omit quotes; other values use single quotes with `\'` for embedded quotes.
+- `as name` and anonymous `as _` declarations for the rest of the file are 0.10 only.
+- Named local declarations can share IDs with each other or with globals, which links their activation. Use distinct identifiers unless sharing is intended.
 
 ## Overlap and preservation
-1. Earlier starting match wins.
-2. Equal start: longer match wins.
-3. Exact same range: current wiki describes last-registered regex replacement winning.
-- The 0.9 prerelease changelog describes exact-range tie resolution as effectively random/newly found. Avoid relying on tie order across versions.
-- Output preservation means `MyClass` to `MyClassRewrite` should not become `MyClassRewriteRewrite` on refresh.
-- Replacements can span ordinary text/comments, but Stonecutter directive comments interrupt matching.
-- A lookup failing near another directive may reflect that boundary rather than a missing literal in the whole file.
+
+1. The earlier starting match wins.
+2. At an equal start the longer match wins.
+3. For an identical range, which only regex patterns can produce, the last registered replacement applies `[wiki]`. Do not build on that order; make the patterns disjoint.
+
+- Output preservation means `MyClass` to `MyClassRewrite` does not become `MyClassRewriteRewrite` on refresh.
+- Replacements can span ordinary text and comments, but a Stonecutter directive comment interrupts matching. A lookup that fails near a directive may reflect that boundary rather than a missing literal.
 
 ## Verification
-Invoke a switch away and back through `terminal`, using exact discovered task names, then inspect `git diff` for repeatable output. Run the core skill's all-node build; a successful one-way rename does not prove reversibility.
+
+Switch away and back with exact discovered task names, then inspect `git diff` for repeatable output. Build all nodes; a successful one-way rename does not prove reversibility.
