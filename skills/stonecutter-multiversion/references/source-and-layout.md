@@ -18,7 +18,7 @@ fabricOnly();
 - Line scope: the condition affects the next non-empty line or logical block.
 - Lookup scope: `//? if condition >> 'token'`; add `+` after `>>` to capture the token.
 - Branch with `else`, `elif`, or `else if`; on 0.9.x every branch before the last must be closed.
-- Predicates: `=`, `!=`, `<`, `>`, `<=`, `>=`, `~` (same major/minor), `^` (same major), plus `!`, `&&`, `||`, and parentheses.
+- Predicates: `=`, `!=`, `<`, `>`, `<=`, `>=`, `~` (same major/minor), `^` (same major); combine them with `&&`, `||`, parentheses, and a leading `!cond` for negation.
 - Define loader/build booleans with `constants`, compared library versions with `targets` (0.10) or `dependencies` (0.9.x; still accepted but deprecated on 0.10 `[source]`), repeated code alternatives with registered `swaps`, and broad reversible renames with `replacements.string`.
 - Prefer a condition for an isolated alternate block, a swap for a repeated fragment, and a string replacement for a reversible rename. Regex replacements are slower and need explicit forward and reverse patterns.
 - Local swaps (`//$ if ...`) and scoped local replacements (`//~ if ... 'old' -> 'new' {` … `//~}`) exist on both lines.

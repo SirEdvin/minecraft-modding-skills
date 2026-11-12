@@ -35,6 +35,8 @@ FENCE_OPEN = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 URI_SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 CATALOG_ENTRY = re.compile(r"^- `([a-z0-9]+(?:-[a-z0-9]+)*)` — (.+)$")
 SUPPORT_DIRECTORIES = ("references", "templates", "scripts")
+# Hermes expands !`cmd` through a shell when a skill loads and refuses to install packages containing it.
+INLINE_SHELL = re.compile(r"!`[^`\s][^`\n]*`")
 
 
 class UniqueKeyLoader(yaml.SafeLoader):
@@ -218,6 +220,11 @@ def validate_skill(skill, errors):
     for markdown_path in sorted(skill.glob("**/*.md")):
         markdown = read_text(markdown_path, errors)
         if markdown is not None:
+            for number, line in enumerate(markdown.splitlines(), 1):
+                if INLINE_SHELL.search(line):
+                    errors.append(
+                        f"{markdown_path}:{number}: inline-shell marker !`...`; reword the text"
+                    )
             graph[markdown_path.resolve()] = reference_targets(
                 markdown_path, skill, markdown, errors
             )

@@ -99,6 +99,12 @@ class ValidatorTests(unittest.TestCase):
         )
         self.assertFalse(any("Traceback" in error for error in errors), errors)
 
+    def test_inline_shell_marker_is_rejected(self):
+        self.write_skill(body="Operators: `!`, `&&`.\n")
+        self.assert_error("SKILL.md:9: inline-shell marker")
+        self.write_skill(body="Operators: `!=`, `&&`, and a leading `!cond`.\n")
+        self.assertEqual([], self.errors())
+
     def test_missing_and_escaping_support_links(self):
         self.write_skill(body="See `references/missing.md`.\n")
         self.assert_error("missing local reference references/missing.md")
