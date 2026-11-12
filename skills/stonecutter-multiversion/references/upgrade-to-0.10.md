@@ -62,8 +62,9 @@ Keep existing safeguards for these; 0.10 does not make them unnecessary `[probe]
 - Task names `Set active project to ...`, `Refresh active project`, `Reset active project`.
 - Switching and compiling in one Gradle invocation still fails implicit-dependency validation.
 - A full-file override in `versions/<project>/src/` still collides with the shared file while that node is active. Keep the consumer-side exclusion.
-- Loader artifact tasks still need an explicit dependency on `stonecutterGenerate`.
 - A switch round trip is byte-identical once the sources are in 0.10 formatting.
+
+Loader artifact tasks are still documented to need an explicit dependency on `stonecutterGenerate` `[wiki]`; the probe builds kept that wiring and were not run without it, so do not remove it on the strength of the upgrade.
 
 Fixes listed in the changelog for deleted generated files, incremental processing, unmatched swaps, and apostrophes are `[changelog]` only. Test the affected path before deleting a local workaround.
 
