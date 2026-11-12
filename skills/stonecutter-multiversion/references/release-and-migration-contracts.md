@@ -1,50 +1,55 @@
-# Stonecutter release and migration contracts
+# Release and migration contracts
 
-## Version selection
+Stonecutter decides which sources a node compiles. It does not decide which artifact a loader toolchain publishes, which coordinates consumers resolve, or whether tests ran. Verify those contracts separately every time the tree, the plugin version, or the release wiring changes.
 
-Check both channels before changing a pin:
+## Choosing a Stonecutter version
 
-- Stable plugin listing: https://plugins.gradle.org/plugin/dev.kikugie.stonecutter
-- Stable metadata: https://maven.kikugie.dev/releases/dev/kikugie/stonecutter/maven-metadata.xml
-- Prerelease metadata: https://maven.kikugie.dev/snapshots/dev/kikugie/stonecutter/maven-metadata.xml
-- Changelog source: https://codeberg.org/stonecutter/docs/src/branch/main/changelogs
+Check the published metadata, not the wiki's default page or a template's pin:
+
+- Plugin Portal: https://plugins.gradle.org/plugin/dev.kikugie.stonecutter and `https://plugins.gradle.org/m2/dev/kikugie/stonecutter/maven-metadata.xml`
+- Stable channel: https://maven.kikugie.dev/releases/dev/kikugie/stonecutter/maven-metadata.xml
+- Prerelease channel: https://maven.kikugie.dev/snapshots/dev/kikugie/stonecutter/maven-metadata.xml
+- Changelog and wiki sources: https://codeberg.org/stonecutter/docs (`changelogs/`, `docs/wiki/v2/`)
 - Implementation: https://codeberg.org/stonecutter/stonecutter
+- Official templates: https://codeberg.org/stonecutter (`template-fabric`, `template-neoforge`, `template-multiloader`)
 
-If the docs website returns scrambled text or a bot challenge, do not summarize it as documentation. Read the upstream Git checkout and the published version's source JAR instead. Record immutable source commits and distinguish unshipped branch changes from the published artifact.
+Rules:
 
-Reviewed on 2026-10-16: stable is **0.9.8**, published 2026-08-31; the newer channel contains **0.10-beta.1**. Do not silently install a prerelease because its version sorts higher.
-
-### Stable 0.9.8
-
-The 0.9.7-to-0.9.8 release adds IDE parameter annotations (`ConstantID`, `TargetID`, `SwapID`, `ReplacementID`) and updates KDoc URLs for the new wiki. It is not a gameplay migration and does not fix consumer publication, source overlay, access-transformer, or runtime-test wiring. Retain those consumer safeguards. The 0.9.7 task-ordering build-service change is already in the previous stable version.
-
-### Separate 0.10 upgrade
-
-Treat this as a toolchain and preprocessing migration, not a patch bump:
-
-- The reviewed beta requires **Java 25 for the Gradle launcher and Gradle 9.7+**. Plugin authors embedding Stonecutter must also account for its Kotlin 2.4 requirement. Keep Minecraft bytecode/toolchains at the target game's Java version.
-- Condition dependencies are being renamed to targets. Property accessor APIs and fallback lookup change. Read later changelog entries: alpha.8 **restored** structured-property exposure through `project.property`/`project.extra` behind default-enabled `EXPOSE_PROPERTIES`; do not repeat the obsolete alpha.7 removal claim as current behavior.
-- `no_short_extension` becomes `short_extension` with inverted meaning. `APPLY_PLUGIN_TO_NODES` becomes `AUTO_APPLY_PLUGIN`; controller plugin application becomes automatic.
-- `tasks.names` replaces deprecated `tasks.named` for Isolated Projects-compatible task paths. `.filters` is deprecated in favor of `.files`; custom scanner/format and serialized model APIs change. The beta adds Java-17-compatible annotations/model artifacts and schema-versioned cache models; this does not lower the plugin launcher requirement.
-- Replacement validation/cycle behavior and inactive-scope processing change. New features include named/multiple local and PCRE replacements, branch inheritance, per-file replacement filters, and conditional file disabling. Processed files must be UTF-8.
-- Later alphas fix deleted generated files, incremental processing, unmatched swaps, disabled-file over-exclusion, apostrophes, and task ordering before the active-node declaration. Test these paths before removing a local workaround; a changelog entry is not proof that a consumer's complete contract is satisfied.
+- The prerelease channel sorts higher than stable. Never pin an alpha or beta because it is the newest entry.
+- Requirements are in the artifact, not the prose: read `org.gradle.jvm.version` in the version's `.module` file for the launcher JVM, and the Gradle floor in the version's source JAR. A changelog can lag or describe a prerelease state that the final release reverted.
+- The wiki stores per-version snippets (`_versions/<topic>.<from>-<to>.md` in the docs repository). When the rendered site is unavailable or returns a bot challenge, read that repository instead of summarizing the error page.
+- Record the commit you read. A branch head can already describe unreleased behaviour.
+- A template shows one working combination of Stonecutter, Gradle, and loader plugins at its commit. Use it to find compatible companion-plugin versions, not as proof for your loader matrix.
 
 ## Migration audit workflow
 
-1. Pin the pre-migration revision for **each** supported Minecraft version. Map old module paths to each logical branch/node, apply full-file override precedence, and compare all production source/resources, not only the active node. Count matched, changed, added and removed files programmatically. Keep build/test-only differences separate from gameplay/API changes.
-2. Check generated inactive sources and active source roots independently. A full-file override must exclude the same shared relative path from Java, Kotlin, resources, `allJava`, and `allSource`. Verify sources JARs as well as classes; a build in only one active state is insufficient.
-3. Preserve the consumer ABI: unique internal module identities, old public Maven coordinates, dependency capabilities, JVM/loader identities, test fixtures and source artifacts. Inspect actual POM/module metadata and packaged JARs across every node.
-4. Treat access wideners/transformers as build inputs. Order Forge-family `createMinecraftArtifacts` after `stonecutterGenerate` and resolve the effective active/versioned transformer. Serialize artifact generation only where the loader tool requires it.
-5. Track the entire metadata expansion map and shared build script as resource-task inputs. Prove raw dependency changes regenerate metadata **without** `clean` or `--rerun-tasks`, and inspect outputs. A task being up-to-date is not proof its placeholder values stayed valid.
-6. Preserve data-component patch removals (`Optional.empty`) when rewriting another component. Test pocket and turtle paths independently. In nullable Java capability contexts, pass `null`; Kotlin `null as Void` throws before the lookup can execute.
-7. Check GameTest bootstrap dependencies, source-set outputs and structure fixtures. `testMod` output does not imply the corresponding `main` output is present. Register all mandatory loaded mods as well as classpath dependencies. Never weaken production capability behavior to make plain JUnit loader-aware.
-8. Delete the exact previous XML report before launch; require a newly created report, at least one executed non-skipped test, zero failures/errors, and consistent declared/testcase counts. Some loader startup failures exit zero. Keep expected optional skips distinct from passed tests.
-9. Use `--no-daemon`, bounded runtime timeouts, and stdout/stderr log redirection. Read only concise diagnostics and parsed report totals into agent context. Build every node with both active states, reset to the VCS node, and inspect source diffs for preprocessing churn.
+Use when sources move into a Stonecutter tree, between layouts, or across a plugin line.
 
-## Convention-toolkit verification
+1. Pin the pre-migration revision for each supported game version. Map old module paths to each branch/node, apply full-file override precedence, and compare all production sources and resources, not only the active node. Count matched, changed, added, and removed files programmatically, and keep build/test-only differences apart from gameplay or API changes.
+2. Check generated inactive sources and the active source roots independently. A full-file override must exclude the same shared relative path from Java, Kotlin, resources, `allJava`, and `allSource`. Verify sources JARs as well as classes; one active state is not enough.
+3. Preserve the consumer ABI: unique internal module identities, existing public Maven coordinates, dependency capabilities, JVM and loader attributes, test fixtures, and source artifacts. Inspect the real POM, module metadata, and packaged JARs of every node.
+4. Treat access wideners and transformers as build inputs. Order loader artifact generation after `stonecutterGenerate`, resolve the node's effective file, and serialize artifact generation only where the loader tool needs it.
+5. Track the whole metadata expansion map and the shared build script as resource-task inputs. Prove that changing a raw dependency value regenerates metadata without `clean` or `--rerun-tasks`, and read the output. An up-to-date task says nothing about whether its placeholder values are still right.
+6. A port that compiles can still drop semantics. For every production file that changed, name the behaviour difference and cover it with a test on the affected node; do not weaken production behaviour to make a plain unit test loader-aware.
+7. Check test bootstrap dependencies, source-set outputs, and fixtures. A test source set's output does not imply the matching `main` output is on its classpath, and a loader run needs every mandatory mod loaded, not just on the compile classpath.
+8. Delete the exact previous test report before a run. Require a newly created report, at least one executed non-skipped test, zero failures and errors, and consistent declared/actual counts. Some loader startup failures exit zero. Count expected optional skips separately from passes.
+9. Run Gradle with `--no-daemon`, bounded timeouts for game processes, and redirected logs. Build every node with each active state, reset to the VCS node, and inspect the source diff for preprocessing churn.
 
-Build modding-buildenv using **its own wrapper**, publish the candidate to a scratch file Maven repository, then inject that repository/version into a disposable consumer with an init script. A Gradle 9 consumer composite runs toolkit build logic under Gradle 9 too; legacy ForgeGradle accessor generation can fail there even when the separately built plugin works. Do not upgrade the toolkit wrapper or commit a local repository merely to bypass this check. Do not pin consumers to an unpublished toolkit candidate.
+## Build and publication contracts
 
-## Evidence scope
+- **Inventory first.** Before promising an all-version release, enumerate the expected artifacts (library × game version × loader, binaries and sources) from settings and publishing configuration. A root release plugin does not prove every leaf is attached.
+- **Select the production artifact per loader toolchain.** The task named `jar` is not always the file players or consumers need: remapping toolchains produce the distributable from a separate remap or reobfuscation task and may write the development JAR to a different directory, while non-remapping toolchains publish `jar` directly. Resolve each node's artifact from the loader plugin's designated task and its declared outputs, and confirm the file with the node's manifest attributes.
+- **Trace the release task.** Follow the actual release task's dependencies and attachment selection, run it with `--dry-run`, and compare the graph with the inventory. A configuration failure leaves the graph unverified; it does not show the task is absent. A dry run is neither a build nor an upload test.
+- **Require unique filenames and complete coverage**, then compare digests of the published assets with the locally selected files. A ZIP that opens is not evidence it is the right node's artifact.
+- **Derive metadata ranges from the central version values.** A dependency range hard-coded to a stable floor rejects a prerelease of the same version and can stop a loader before any test runs. Fix the metadata; do not bypass validation.
+- **Versions and tags.** Read centralized versions and existing remote tags/releases before choosing a version. Never reuse a version or overwrite published assets. After publication read back the exact release and verify every expected version/loader asset instead of trusting the Gradle exit code.
+- **Order concrete publishing tasks** with the controller's ordering API when the destination cares about upload order, not the umbrella task that delegates to them.
+- **Report four states separately:** migration/runtime acceptance, current-checkout buildability, release-task coverage, and actual public publication. Earlier acceptance does not certify a fresh release preflight.
 
-The 0.9.8 upgrade was exercised in Minecraft-Modding-Libs and TemplateProject, including TemplateProject's switch/build/reset round trip. The 0.10 beta was researched, **not adopted or runtime-verified**. Consult repository audit reports for concrete task coverage; source equivalence, compilation, unit tests, loader tests and interactive gameplay are different levels of evidence.
+## Verifying a shared convention plugin
+
+When nodes apply an in-house convention or toolkit plugin, build that plugin with its own wrapper, publish the candidate to a scratch file-based Maven repository, and inject repository and version into a disposable consumer with an init script. A composite build runs the toolkit's build logic under the consumer's Gradle, which can fail in legacy loader tooling even when the separately built plugin works. Do not raise the toolkit's wrapper or commit a local repository to get past that, and do not pin consumers to an unpublished candidate.
+
+## Evidence levels
+
+Source equivalence, compilation, unit tests, loader-run tests, and interactive gameplay are different levels of evidence. State which one a claim rests on, and name what was not run.

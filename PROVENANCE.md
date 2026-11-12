@@ -158,3 +158,23 @@ The 0.9.8 refresh adds independently distilled notes from these official pages:
 The portal listed 0.9.8 while the live wiki described some 0.10 APIs. The package references explicitly version-gate those APIs and preserve disagreements between wiki and changelog rather than asserting unverified historical availability. Earlier source/template commit observations above remain historical; this refresh does not imply reinspection of those commits.
 
 Refresh verification used a disposable Java-only fixture with Stonecutter 0.9.8, Gradle 9.6.1, and Java 21. Both nodes (1.20.1 and 1.21.1) compiled; JSON tree loading, merged structured properties, typed integer access, colon-path raw-list access, generated inactive sources, and named reversible string replacement were exercised. Separate refresh/switch/reset invocations succeeded, and the source round trip was byte-identical after initial comment normalization. Combining reset and build in one invocation failed Gradle implicit-dependency validation; separating them passed. Minecraft loader runtimes, publishing services, and forward-looking 0.10 APIs were not exercised.
+
+## Stonecutter 0.10 refresh (2026-11-12)
+
+The 0.3.0 skill update re-validates every version-sensitive statement against the stable 0.10 release and labels each one with its evidence level inside the package.
+
+Published artifacts and upstream revisions read:
+
+- https://plugins.gradle.org/m2/dev/kikugie/stonecutter/maven-metadata.xml and https://maven.kikugie.dev/releases/dev/kikugie/stonecutter/maven-metadata.xml (latest and release `0.10`); https://maven.kikugie.dev/snapshots/dev/kikugie/stonecutter/maven-metadata.xml (ends at `0.10-beta.4`)
+- `stonecutter-0.10.module` (built with Gradle 9.8.2, `org.gradle.jvm.version` 25) and `stonecutter-0.10-sources.jar` (SHA-256 `d1c64c784875b8a148440eb1ebec49f53a43ee4ae7b3061a8417feef9e0e3692`); `stonecutter-0.9.8.module` (JVM 21) and its source JAR for the comparison column
+- https://codeberg.org/stonecutter/docs at `b3b446df7f5c296202066f9ded738f3b13b7f48e`: `changelogs/stonecutter-0.10.md` and the versioned wiki snippets under `docs/wiki/v2/**/_versions/`
+- https://codeberg.org/stonecutter/stonecutter at `8329ec273bcfa121d313613f5a2bd41f4ef34a25` (version bump to 0.10)
+- https://codeberg.org/stonecutter/template-fabric at `c6212f2bb97a5382ed4ccb805eddd324bcec1cf7`, template-neoforge at `7ecc883c64f964390e8b026ca4a2d5bef9d547dc`, template-multiloader at `805360f1178e0721bbf062f7df04eeb1a0c689e1` (all pin 0.10 on Gradle 9.9.0)
+
+Probe builds, all in disposable copies with `--no-daemon`:
+
+- A two-node Java-only fixture with structured properties, a per-node `gradle.properties`, a full-file override, `#`-comment and comment-less resources, and a global string replacement. Run with 0.10 on Gradle 9.5.0/Java 21 and Gradle 9.5.0/Java 25 (both rejected with the requirement messages quoted in the package), Gradle 9.7.0/Java 25 and Gradle 9.9.1/Java 25 (passing); and with 0.9.8 on Gradle 9.5.0/Java 21 and Gradle 9.9.1/Java 25 for the comparison column. Exercised: project/task listing, all-node build, switch, refresh, reset, switch-plus-build in one invocation, active-node override collision, property fallback, deprecated accessors, default file formats, and node removal in wrong and right order.
+- A two-tree fixture with a root branch and a `fabric` branch per tree (eight nodes), on 0.10 with Gradle 9.9.1/Java 25 and on 0.9.8 with Gradle 9.5.0/Java 21: node paths, branch IDs, cross-branch project dependency, all-node build, qualified versus unqualified switching, and reset.
+- A scratch copy of a four-node flat Fabric/Forge/NeoForge template project moved to 0.10 on Gradle 9.9.1 with a Java 25 launcher: configuration, full build of all four nodes, and a switch/reset round trip. It needed one accessor edit and a newer loader-compatibility plugin; nothing was committed to that project.
+
+Not exercised: Groovy DSL, Isolated Projects, custom file handlers, PCRE replacements, file disabling, IDE integration, game runtimes, and publication. Statements about those carry `[changelog]`, `[wiki]`, or `[unverified]` labels in the package.
