@@ -199,6 +199,66 @@ Capture:
 
 Use explicit timeouts in CI. A server process that stays alive without reaching its ready marker is not a passed smoke test.
 
+### Stateful Gameplay Regression Protocol
+
+Use this pack-testing convention when changed gameplay moves items, equips
+upgrades, consumes resources, or stores state across restart. It is a test-design
+protocol, not a promise that a particular mod version passes.
+
+Keep three independently reported phases:
+
+| Phase | Setup allowed | Evidence required |
+|---|---|---|
+| Native action | Provision a clean disposable fixture once | Call the player-facing API/action; verify return value, resulting identity, counts and exposed behavior |
+| Same-version restart | Save and gracefully stop; reuse the same hosts and world | Observe existing state after restart without re-equipping, replacing hosts or rerunning provisioning |
+| Version migration | Create state with pinned old artifacts, save and stop; change only the planned release inputs | Observe the same hosts under new artifacts; retain old/new hashes and before/after state |
+
+1. **Prove a small witness before the full matrix.** Check one representative
+   host and a built-in control through all relevant phases. Allocate stable host
+   identities during initial provisioning, not by rewriting an already-active
+   object's identity. Do not assume a live object reloads edited serialized data.
+2. **Isolate shared state.** Use a dedicated disposable test player and inventory;
+   record the selected slot, item identity, count and relevant metadata. Keep
+   unrelated eligible items out of the native-action fixture. Serialize cases
+   that share an inventory, player or host so one case cannot consume another's
+   items. Never clear a real player's inventory or reset a live world for a test.
+3. **Exercise boundary cases separately.** Test one item and a stack greater than
+   one where the item supports stacking; also test a built-in equivalent when
+   available. Assert the returned/remaining counts and equipped item identity,
+   not just a truthy result or a nonempty peripheral list. A built-in control
+   narrows attribution; it does not prove a specific upstream source defect or
+   imply the same result on another loader or Minecraft line.
+4. **Separate setup from observation.** Before stopping, switch test startup
+   automation to an observation-only mode and verify that mode is saved. On
+   restart, do not let setup scripts silently recreate hosts or replay equip
+   operations. A newly provisioned object proves new-world behavior, not retained
+   state. Compare semantic persistent fields; session IDs and other expected
+   ephemeral fields need not remain byte-identical.
+5. **Wait for real lifecycle boundaries.** Observe native-action completion,
+   the applicable tick/save barrier and graceful shutdown before snapshotting or
+   swapping artifacts. Match barriers to the actual harness/mod release; a
+   fixed sleep or a tool wait timeout is not proof of completed persistence.
+6. **Preserve and classify failed trials.** Keep exploratory, dirty-inventory,
+   race-affected and final trials separately. If fixture state invalidates a
+   result, fix the fixture and rerun the focused witness before the expensive
+   matrix. Do not overwrite a failure with a clean run and call it a proven
+   product fix. Unexpected inventory/host changes invalidate the relevant
+   persistence claim even if startup and all fresh fixtures pass.
+
+For example, CC:Tweaked's documented
+[`pocket.equipBack`](https://tweaked.cc/module/pocket.html#v:equipBack) searches
+the player's inventory starting at the selected slot. Thus a test must control
+the inventory rather than assume the item just unequipped is selected again.
+Verify that contract against the tested release; this guidance does not assert
+that any specific release has or fixes a stack-count defect.
+
+Report server/client smoke, native action, same-version restart and migration
+verdicts separately, including expected/observed fixture counts and unrun cases.
+For a mutation-sensitive check, demonstrate that the assertion can detect a
+deliberately wrong result in an isolated fixture; never weaken the assertion to
+make the matrix green. Retain full logs outside the pack and emit bounded
+summaries that preserve the underlying command exit status.
+
 ## Git And Review
 
 A useful `.gitignore` excludes build/export artifacts and runtime state. `.packwizignore` independently controls installation. A file may be committed but excluded from the pack, such as contributor documentation or CI scripts.
