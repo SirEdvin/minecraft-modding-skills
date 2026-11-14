@@ -5,7 +5,7 @@ license: MIT
 compatibility: Minecraft Java Edition modpacks using Packwiz with Fabric, Quilt, Forge, or NeoForge; exact commands, file formats, KubeJS APIs, loader behavior, and Java requirements are version-sensitive.
 metadata:
   author: "SirEdvin"
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Minecraft Modpack Authoring
@@ -47,7 +47,8 @@ manifest is not a reason to initialize Packwiz in its root.
 - [Packwiz commands](references/packwiz-workflows.md): CLI contracts, source pin,
   ignore rules, installers and CI.
 - [Content and testing](references/modpack-content-and-testing.md): loader config,
-  scripts, datapacks, quests, worlds, client/server and upgrade matrix.
+  scripts, datapacks, quests, worlds, client/server and upgrade matrix; separate
+  clean-fixture actions from observation-only restart and migration checks.
 - [Pinned example and reproducibility checks](references/reproducibility-audit.md):
   source evidence, export self-inclusion and installer version boundaries.
 
