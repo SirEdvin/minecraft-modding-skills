@@ -48,7 +48,8 @@ manifest is not a reason to initialize Packwiz in its root.
   ignore rules, installers and CI.
 - [Content and testing](references/modpack-content-and-testing.md): loader config,
   scripts, datapacks, quests, worlds, client/server and upgrade matrix; separate
-  clean-fixture actions from observation-only restart and migration checks.
+  clean-fixture actions from observation-only restart and migration checks;
+  validate canonical round trips and filter eligible cases before allocating slots.
 - [Pinned example and reproducibility checks](references/reproducibility-audit.md):
   source evidence, export self-inclusion and installer version boundaries.
 

@@ -50,7 +50,7 @@ This repository's expanded coverage was inspired by reviewing the topic scope of
 `minecraft-modpack-authoring`:
 
 - https://tweaked.cc/module/pocket.html#v:equipBack
-- The stateful gameplay protocol is independently distilled from fixture-isolation and restart-validation failures. The pocket API documentation supports inventory-search semantics only; the protocol is a recommended testing convention, not a claim of runtime coverage or release compatibility.
+- The stateful gameplay protocol is independently distilled from fixture-isolation, synthetic item round-trip, pre-filter capacity and restart-validation failures. It covers canonical controls, decoder boundaries and both-side fixture survival without prescribing a universal component representation. The pocket API documentation supports inventory-search semantics only; the protocol is a recommended testing convention, not a claim of runtime coverage or release compatibility.
 - https://packwiz.infra.link/
 - https://packwiz.infra.link/tutorials/creating/getting-started/
 - https://packwiz.infra.link/tutorials/creating/adding-mods/

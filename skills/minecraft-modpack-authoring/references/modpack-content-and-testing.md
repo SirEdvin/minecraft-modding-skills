@@ -259,6 +259,46 @@ deliberately wrong result in an isolated fixture; never weaken the assertion to
 make the matrix green. Retain full logs outside the pack and emit bounded
 summaries that preserve the underlying command exit status.
 
+### Validate Fixture Construction Before Attributing A Product Failure
+
+Apply these checks to both the reusable fixture generator and one-off probes;
+validating one does not certify the other. Treat them as testing conventions,
+not universal serialization rules for a particular mod or Minecraft release.
+
+- **Start from a reachable item.** Obtain a specimen through the intended recipe,
+  creative entry or native equip path on the exact pinned runtime. Preserve its
+  required components, linking state and provenance. A creative-only display
+  specimen does not prove survival-gameplay reachability; test that path separately.
+- **Prove the serialized round trip.** Compare generated fixtures with that
+  specimen, serialize them, then feed the emitted form through the relevant
+  decoder. Check retained identity and required semantic state. An abbreviated
+  command form being accepted does not prove that its expanded stored or network
+  form is valid. Do not copy a shorthand or legacy component shape across releases
+  without checking the actual codec and constructor validation paths.
+- **Keep decoder boundaries explicit.** A direct server decode is a useful small
+  witness, not a substitute for actual entity reload, client synchronization or
+  a same-world restart. If restart is unavailable, label it unverified; neither
+  a fixed wait nor attempted chunk unload proves that objects were reconstructed.
+- **Check both sides and fixture survival.** Inspect server entity-load and item
+  validation errors as well as the client log, and reconcile expected fixture
+  identities/counts after each boundary. For an ordinary positive smoke test,
+  an unexpected missing fixture or decode error invalidates the pass even if
+  startup and client join succeed. Keep intentional malformed-input trials
+  separate with their own expected error assertions.
+- **Filter before allocating.** Compute eligible cases from measured runtime
+  properties first (for example, stackability), then reserve control cases,
+  assign slots and assert capacity on that same filtered sequence. Keep a
+  reasoned exclusion inventory; do not silently drop an intended case to fit.
+  Test mixed eligible/ineligible input, no eligible cases, exact capacity and
+  overflow. A capacity assertion in setup is a harness failure, not an observed
+  failure of the gameplay action that never ran.
+
+When a generated fixture fails but the canonical control survives the same
+boundary, preserve both observations and repair the fixture before repeating the
+focused gameplay witness. This narrows attribution; it does not certify all
+canonical paths, versions or migrations. Keep historical failed reports immutable
+and make the corrected trial a new, explicitly linked result.
+
 ## Git And Review
 
 A useful `.gitignore` excludes build/export artifacts and runtime state. `.packwizignore` independently controls installation. A file may be committed but excluded from the pack, such as contributor documentation or CI scripts.
